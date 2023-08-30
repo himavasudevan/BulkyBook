@@ -37,9 +37,10 @@ public class HomeController : Controller
         {
             Count=1,
             ProductId=productId,
-            Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType"),
+            Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType,ProductImages"),
         };
 
+        
         return View(cartObj);
     }
 

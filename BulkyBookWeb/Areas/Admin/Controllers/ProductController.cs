@@ -1,4 +1,5 @@
 ﻿using BulkyBook.DataAccess;
+using BulkyBook.DataAccess.Migrations;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NuGet.Packaging.Signing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -68,7 +70,6 @@ public class ProductController : Controller
 
 
     }
-
     //POST
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -100,6 +101,29 @@ public class ProductController : Controller
                 obj.Product.ImageUrl = @"\images\products\" + fileName + extension;
 
             }
+
+            if (obj.Images != null)
+            {
+                obj.Product.ProductImages = new List<ProductImage>();
+                foreach (var image in obj.Images)
+                {
+                    if (image != null)
+                    {
+                        string fileName = Guid.NewGuid().ToString();
+                        var uploads = Path.Combine(wwwRootPath, @"images\products");
+                        var extension = Path.GetExtension(image.FileName);
+
+                        
+
+                        using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
+                        {
+                            image.CopyTo(fileStreams);
+                        }
+                        obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
+                    }
+
+                }
+            }
             if (obj.Product.Id == 0)
             {
                 _unitOfWork.Product.Add(obj.Product);
@@ -114,6 +138,7 @@ public class ProductController : Controller
         }
         return View(obj);
     }
+
 
 
 
