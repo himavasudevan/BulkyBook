@@ -1,9 +1,13 @@
 ﻿@model BulkyBook.Models.ViewModels.ProductVM
-
+@*<link rel="stylesheet" href="~/css/StyleSheet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+*@
+                    
+   
 <form method="post" asp-action="Upsert" enctype="multipart/form-data">
     <input asp-for="Product.Id" hidden />
     <input asp-for="Product.ImageUrl" hidden />
-
+    
     <div class="row">
         <div class="col-10">
             <div class="border p-3 mt-4 row">
@@ -60,17 +64,7 @@
                     <label asp-for="Images">Upload Images</label>
                     <input type="file" name="Images" multiple class="form-control" />
                 </div>
-                <div class="col-12 pt-4">
-                    @if (Model.Product.ProductImages != null)
-                    {
-
-
-                        @foreach (var productimage in Model.Product.ProductImages)
-                        {
-                            <img src="@productimage" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9; margin-bottom: 10px;" />
-                        }
-                    }
-                </div>
+              
 
 
 
@@ -106,10 +100,75 @@
             </div>
         </div>
         <div class="col-2 pt-4">
-            <img src="@Model.Product.ImageUrl"
+            @*<img src="@Model.Product.ImageUrl"
                  width="100%" style="border-radius:5px; border:1px solid #bbb9b9" />
+        </div*@
+
+
+
+
+        
+       
+       @* <div class="container1">
+            <div class="swiper">
+                <!-- Additional required wrapper -->
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                    
+                    <div class="swiper-slide">
+                       *@
+                       
+                            <img src="@Model.Product.ImageUrl"
+                             width="100%" style="border-radius:5px; border:1px solid #bbb9b9" />
+                    
+                        @if (Model.Product.ProductImages != null)
+                        {
+                            @foreach (var image in Model.Product.ProductImages)
+                            {
+                                    <div class="swiper-slide"><img src="@image.ImageUrl" width="100%" style="border-radius:5px; border:1px solid #bbb9b9"/></div>
+                            }
+                        }
+                    </div>
+                    </div>
+                @*</div>
+                <!-- If we need pagination -->
+                <div class="swiper-pagination"></div>
+
+                <!-- If we need navigation buttons -->
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
         </div>
-    </div>
+        </div>*@
+    
+   @* <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script>
+        const swiper = new Swiper('.swiper', {
+            // Optional parameters
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            loop: true,
+
+            // If we need pagination
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+
+            // And if we need scrollbar
+
+        });
+    </script>
+*@
+    
 
 
 

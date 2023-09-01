@@ -51,6 +51,7 @@ public class ProductController : Controller
                 Text = i.Name,
                 Value = i.Id.ToString()
             }),
+            
         };
 
         if (id == null || id == 0)
@@ -62,7 +63,8 @@ public class ProductController : Controller
         }
         else
         {
-            productVM.Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
+            productVM.Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id,"ProductImages");
+           // productVM.Images=_unitOfWork.Product.GetAll(includeProperties: "ProductImages");
             return View(productVM);
 
             //update product
