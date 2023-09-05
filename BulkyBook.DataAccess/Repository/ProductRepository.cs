@@ -1,5 +1,6 @@
 ﻿using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,8 @@ namespace BulkyBook.DataAccess.Repository
 
         public void Update(Product obj)
         {
-            var objFromDb = _db.Products.FirstOrDefault(u => u.Id == obj.Id);
+            var objFromDb = _db.Products.Include(P=>P.ProductImages)
+                .FirstOrDefault(u => u.Id == obj.Id);
             if (objFromDb != null)
             {
                 objFromDb.Title = obj.Title;
@@ -33,9 +35,23 @@ namespace BulkyBook.DataAccess.Repository
                 objFromDb.CategoryId = obj.CategoryId;
                 objFromDb.Author = obj.Author;
                 objFromDb.CoverTypeId = obj.CoverTypeId;
+
                 if (obj.ImageUrl != null)
                 {
-                    objFromDb.ImageUrl = obj.ImageUrl;  
+                    objFromDb.ImageUrl = obj.ImageUrl;
+                }
+                if (obj.ProductImages != null)
+                {
+                    if (objFromDb.ProductImages == null)
+                    {
+                        objFromDb.ProductImages=new List<ProductImage>();
+                    }
+
+                    foreach (var image in obj.ProductImages)
+                    {
+                        objFromDb.ProductImages.Add(image);
+                    }
+
                 }
             }
         }

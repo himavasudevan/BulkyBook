@@ -70,11 +70,11 @@
                                 <!-- Additional required wrapper -->
                                 <div class="swiper-wrapper">
                                     <!-- Slides -->
-                                    <div class="swiper-slide"><img src="@Model.Product.ImageUrl" width="100%" class="rounded"></div>
+                                    <div class="swiper-slide"><img src="@Model.Product.ImageUrl" width="100%" style="height:300px" class=" rounded"></div>
 
                                     @foreach (var image in Model.Product.ProductImages)
                                     {
-                                        <div class="swiper-slide"><img src="@image.ImageUrl" width="100%" class="rounded"></div>
+                                        <div class="swiper-slide"><img src="@image.ImageUrl" width="100%" style="height:300px" class="rounded"></div>
                                     }
 
                                 </div>

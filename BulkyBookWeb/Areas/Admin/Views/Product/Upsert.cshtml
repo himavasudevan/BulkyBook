@@ -7,6 +7,8 @@
 <form method="post" asp-action="Upsert" enctype="multipart/form-data">
     <input asp-for="Product.Id" hidden />
     <input asp-for="Product.ImageUrl" hidden />
+    @*<input asp-for="Product.ProductImages" hidden/>*@
+    
     
     <div class="row">
         <div class="col-10">
@@ -99,75 +101,24 @@
 
             </div>
         </div>
-        <div class="col-2 pt-4">
-            @*<img src="@Model.Product.ImageUrl"
-                 width="100%" style="border-radius:5px; border:1px solid #bbb9b9" />
-        </div*@
-
-
-
-
         
-       
-       @* <div class="container1">
-            <div class="swiper">
-                <!-- Additional required wrapper -->
-                <div class="swiper-wrapper">
-                    <!-- Slides -->
-                    
-                    <div class="swiper-slide">
-                       *@
-                       
-                            <img src="@Model.Product.ImageUrl"
-                             width="100%" style="border-radius:5px; border:1px solid #bbb9b9" />
-                    
-                        @if (Model.Product.ProductImages != null)
-                        {
-                            @foreach (var image in Model.Product.ProductImages)
-                            {
-                                    <div class="swiper-slide"><img src="@image.ImageUrl" width="100%" style="border-radius:5px; border:1px solid #bbb9b9"/></div>
-                            }
-                        }
-                    </div>
-                    </div>
-                @*</div>
-                <!-- If we need pagination -->
-                <div class="swiper-pagination"></div>
+        <div class="col-2 pt-4">
+            <img src="@Model.Product.ImageUrl" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9; margin-bottom: 10px;height:300px" />
 
-                <!-- If we need navigation buttons -->
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-            </div>
+            @if (Model.Product.ProductImages != null)
+            {
+                @foreach (var image in Model.Product.ProductImages)
+                {
+                    <div style="margin-bottom: 10px;">
+                        <img src="@image.ImageUrl" width="100%" style="border-radius: 5px; border: 1px solid #bbb9b9;height:300px" />
+                        <a asp-controller="Product" asp-action="ImageDelete" asp-route-id="@image.Id" asp-route-productId="@Model.Product.Id" class="btn btn-danger mt-2"><i class="bi bi-trash-fill"></i> </a>
+                    </div>
+                }
+            }
         </div>
-        </div>*@
-    
-   @* <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-    <script>
-        const swiper = new Swiper('.swiper', {
-            // Optional parameters
-            autoplay: {
-                delay: 3000,
-                disableOnInteraction: false,
-            },
-            loop: true,
 
-            // If we need pagination
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-
-            // Navigation arrows
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-
-            // And if we need scrollbar
-
-        });
-    </script>
-*@
+    </div>
+                
     
 
 

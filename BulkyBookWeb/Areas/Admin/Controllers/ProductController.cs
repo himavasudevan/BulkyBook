@@ -1,5 +1,6 @@
 ﻿using BulkyBook.DataAccess;
 using BulkyBook.DataAccess.Migrations;
+using BulkyBook.DataAccess.Repository;
 using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
@@ -9,7 +10,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using NuGet.Packaging.Signing;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -106,7 +109,9 @@ public class ProductController : Controller
 
             if (obj.Images != null)
             {
+                if (obj.Product.ProductImages == null) { 
                 obj.Product.ProductImages = new List<ProductImage>();
+                    }
                 foreach (var image in obj.Images)
                 {
                     if (image != null)
@@ -121,22 +126,34 @@ public class ProductController : Controller
                         {
                             image.CopyTo(fileStreams);
                         }
+                    
                         obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
+
+                        //if (obj.Product.ProductImages != null)
+                        //{
+                        //    obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
+
+                        //}
                     }
 
                 }
+                
             }
             if (obj.Product.Id == 0)
             {
                 _unitOfWork.Product.Add(obj.Product);
+                _unitOfWork.Save();
+                TempData["success"] = "Product created successfully";
+                return RedirectToAction("Index");
             }
             else
             {
                 _unitOfWork.Product.Update(obj.Product);
+                _unitOfWork.Save();
+                TempData["success"] = "Product updated successfully";
+                return RedirectToAction("Index");
             }
-            _unitOfWork.Save();
-            TempData["success"] = "Product created successfully";
-            return RedirectToAction("Index");
+            
         }
         return View(obj);
     }
@@ -150,6 +167,34 @@ public class ProductController : Controller
     {
         var productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
         return Json(new { data = productList });
+    }
+    //POST
+    [HttpGet]
+    public IActionResult ImageDelete(int? id,int? productId)
+    {
+        var product = _unitOfWork.Product.GetFirstOrDefault(u =>u.Id==productId ,"ProductImages");
+
+        if (product != null)
+        {
+            var productImage = product.ProductImages.FirstOrDefault(u => u.Id == id);
+
+            product.ProductImages.Remove(productImage);
+            _unitOfWork.Product.Update(product);
+            _unitOfWork.Save();
+
+            TempData["success"] = "Product images deleted successfully";
+            return RedirectToAction("Upsert", new {id=productId});
+
+        }
+        return NotFound();
+            
+
+        
+
+        
+       
+
+       
     }
 
     //POST
@@ -173,5 +218,11 @@ public class ProductController : Controller
         return Json(new { success = true, message = "Delete Successful" });
 
     }
+    
+   
+
     #endregion
+
+
+
 }
