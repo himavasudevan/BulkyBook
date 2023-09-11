@@ -207,6 +207,13 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         public IActionResult Plus(int cartId)
         {
             var cart = _unitOfWork.ShoppingCart.GetFirstOrDefault(u => u.Id == cartId);
+            var product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == cart.ProductId);
+            if (cart.Count >= product.Stock)
+            {
+                TempData["error"] = "You cant order more than  "+product.Stock;
+                return RedirectToAction(nameof(Index));
+
+            }
             _unitOfWork.ShoppingCart.IncrementCount(cart, 1);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));

@@ -43,14 +43,17 @@
 							</li>
 						}
 						<li class="nav-item">
-							<a class=nav-link asp-area="Admin" asp-controller="Order" asp-action="Index">
+							<a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">
 								Manage Order
 							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" asp-area="Customer" asp-controller="Home" asp-action="WishList">View Wish List</a>
 						</li>
 
 						
 						<li class="nav-item">
-							<a class=nav-link asp-area="Customer" asp-controller="Cart" asp-action="Index">
+							<a class="nav-link" asp-area="Customer" asp-controller="Cart" asp-action="Index">
 								@await Component.InvokeAsync("ShoppingCart")
 							</a>
 						</li>

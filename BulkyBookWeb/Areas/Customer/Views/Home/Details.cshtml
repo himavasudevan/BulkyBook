@@ -7,8 +7,9 @@
     <div class="card  container pt-4">
         <div class="card-header bg-primary text-light ml-0  row ">
             <div class="col-12 col-md-6">
-                <h1 class="text-white-50">@Model.Product.Title</h1>
+                <h1 class="text-white-50">@Model.Product.Title  <a id="addToWishListBtn" asp-controller="home" asp-action="AddWishList" class="btn btn-primary" asp-route-id="@Model.Product.Id"><i  class="bi bi-heart"></i> </a> </h1>
                 <p class="text-warning">by @Model.Product.Author</p>
+                
             </div>
             <div class="col-12 col-md-6 text-end pt-4">
                 <span class="badge bg-info pt-2" style="height:30px;">@Model.Product.CoverType.Name</span>
@@ -59,7 +60,7 @@
                         </div>
                         <div class="row pl-2">
                             <div class="col-2 text-primary"><h4>Count</h4></div>
-                            <div class="col-10"><input asp-for="Count" class="form-control" /></div>
+                            <div class="col-10"><input asp-for="Count" class="form-control" max="@Model.Product.Stock"/></div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-3 offset-lg-1 text-center">
@@ -132,4 +133,26 @@
         // And if we need scrollbar
 
     });
+
+    
+       
+        document.addEventListener("DOMContentLoaded", function () {
+            const addToWishListBtn = document.getElementById("addToWishListBtn");
+            const heartIcon = addToWishListBtn.querySelector(".bi-heart");
+
+            // Add a click event listener to handle adding to the wish list
+            addToWishListBtn.addEventListener("click", function () {
+                // Toggle the button class
+                addToWishListBtn.classList.toggle("success-button"); // Apply the success color class
+
+                // Toggle the heart icon class
+                heartIcon.classList.toggle("bi-heart");
+                heartIcon.classList.toggle("bi-heart-fill"); // Change to your desired filled heart icon
+
+                // Log a message to the console for debugging
+                console.log("Button clicked. Class and icon toggled.");
+            });
+        });
 </script>
+
+

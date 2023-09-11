@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
+using NuGet.Packaging.Signing;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,7 +28,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties:"Category,CoverType");
+        IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
 
         return View(productList);
     }
@@ -35,12 +37,12 @@ public class HomeController : Controller
     {
         ShoppingCart cartObj = new()
         {
-            Count=1,
-            ProductId=productId,
+            Count = 1,
+            ProductId = productId,
             Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType,ProductImages"),
         };
 
-        
+
         return View(cartObj);
     }
 
@@ -55,9 +57,10 @@ public class HomeController : Controller
 
         ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
             u => u.ApplicationUserId == claim.Value && u.ProductId == shoppingCart.ProductId);
-            
 
-        if (cartFromDb == null) {
+
+        if (cartFromDb == null)
+        {
 
             _unitOfWork.ShoppingCart.Add(shoppingCart);
             _unitOfWork.Save();
@@ -69,7 +72,7 @@ public class HomeController : Controller
             _unitOfWork.ShoppingCart.IncrementCount(cartFromDb, shoppingCart.Count);
             _unitOfWork.Save();
         }
-        
+
 
         return RedirectToAction(nameof(Index));
     }
@@ -85,4 +88,57 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    public IActionResult AddWishList(int id,bool isWishListPage=false)
+                    {
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+        var existingWishListItem = _unitOfWork.WishList.GetFirstOrDefault(w => w.ProductId == id && w.ApplicationUserId == claim.Value);
+        if (existingWishListItem != null)
+        {
+            
+                _unitOfWork.WishList.Remove(existingWishListItem);
+            _unitOfWork.Save();
+           
+            TempData["error"] = "Product removed from wish list";
+            if (isWishListPage == false)
+            {
+                return RedirectToAction("Details", new { ProductId = id });
+            }
+            else
+            {
+                return RedirectToAction("WishList");
+            }
+
+        }
+        else
+        {
+            
+
+                _unitOfWork.WishList.Add(new WishList() { ProductId = id, ApplicationUserId = claim.Value });
+                _unitOfWork.Save();
+                TempData["success"] = "Product Added to wish list";
+
+                return RedirectToAction("Details", new { ProductId = id });
+            
+        }
+        
+        
+        
+
+    }
+    public IActionResult WishList()
+    {
+        return View();
+
+    }
+    public IActionResult GetWishList()
+    {
+
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+        var WishListItem = _unitOfWork.WishList.GetAll( w=> w.ApplicationUserId == claim.Value, includeProperties: "Product");
+        return Json(new { data = WishListItem });
+    }  
 }
+
+

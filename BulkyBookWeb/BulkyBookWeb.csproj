@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Customer\Views\Home\Class.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Areas\Admin\Views\Product\image.cshtml" />
+    <Content Remove="Areas\Customer\Views\Home\ViewWishList.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

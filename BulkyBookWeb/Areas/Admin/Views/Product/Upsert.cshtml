@@ -85,6 +85,12 @@
                     </select>
                     <span asp-validation-for="Product.CoverTypeId" class="text-danger"></span>
                 </div>
+                <div class="mb-3 col-6">
+                    <label asp-for="Product.Stock"></label>
+                    <input asp-for="Product.Stock" class="form-control" />
+                    <span asp-validation-for="Product.Stock" class="text-danger"></span>
+
+                </div>
                 <div class="col-12">
                     @if (Model.Product.Id != 0)
                     {

@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Wish List";
+}
+
+<h1>Wish List</h1>
+
+<table id="wishListTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><a href="@Url.Action("Details", "Product", new { id = item.ProductId })">@item.Product.Name</a></td>
+                <td>@item.Product.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <link href="https://cdn.datatables.net/1.11.6/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.6/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#wishListTable').DataTable({
+                "paging": true,  // Enable pagination
+                "lengthChange": true,  // Allow changing the number of items per page
+                "searching": true,  // Enable search functionality
+                "ordering": true,  // Allow sorting by columns
+                "info": true,  // Show table information (e.g., "Showing 1 to 10 of 20 entries")
+                "autoWidth": false,  // Disable auto-width calculation
+                "responsive": true  // Enable responsive design for mobile devices
+            });
+        });
+    </script>
+}
