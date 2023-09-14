@@ -5,6 +5,7 @@ using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using NuGet.Packaging.Signing;
@@ -26,9 +27,42 @@ public class HomeController : Controller
         _unitOfWork = unitOfWork;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string SearchString="",string SortOrder="ProductName")
     {
-        IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
+		IEnumerable<Product> productList;
+
+        if (string.IsNullOrWhiteSpace(SearchString))
+        {
+            // If no search term is provided, show all products.
+            productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
+        }
+        else
+        {
+            // If a search term is provided, filter products by name.
+            productList = _unitOfWork.Product.GetAll(
+                filter: p => p.Title.Contains(SearchString),
+                includeProperties: "Category,CoverType"
+            );
+        }
+        if (SortOrder == "ProductName")
+        {
+
+            productList = productList.OrderBy(p => p.Title);
+
+        }
+        else if(SortOrder == "PrizeFromHighToLow")
+        {
+            productList = productList.OrderByDescending(p => p.Price);
+
+        }
+        else
+        {
+            productList = productList.OrderBy(p => p.Price);
+
+        }
+
+
+        //IEnumerable<Product> productList = _unitOfWork.Product.GetAll(,includeProperties: "Category,CoverType");
 
         return View(productList);
     }
@@ -138,7 +172,133 @@ public class HomeController : Controller
         var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
         var WishListItem = _unitOfWork.WishList.GetAll( w=> w.ApplicationUserId == claim.Value, includeProperties: "Product");
         return Json(new { data = WishListItem });
-    }  
+    }
+    public IActionResult Address()
+    {
+        return View();
+
+    }
+    public IActionResult GetAddress()
+    {
+
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+        var AddressDetails = _unitOfWork.Address.GetAll(w => w.ApplicationUserId == claim.Value, includeProperties: "ApplicationUser");
+        return Json(new { data = AddressDetails });
+    }
+    //GET
+   public IActionResult AddAddress()
+    {
+        
+        return View();
+
+    }
+    
+
+    //POST
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult AddAddress(Address obj)
+    {
+
+            if (ModelState.IsValid)
+        {
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            obj.ApplicationUserId = claim.Value;
+            _unitOfWork.Address.Add(obj);
+                _unitOfWork.Save();
+                TempData["success"] = "Address Added successfully";
+                return RedirectToAction("Address");
+            }
+        
+        return View(obj);
+    }
+    //public IActionResult Index1()
+    //{
+    //    IEnumerable<Address> objAddressList = _unitOfWork.Address.GetAll();
+    //    return View(objAddressList);
+    //}
+    public IActionResult DeleteAddress(int? id)
+    {
+        if (id == null || id == 0)
+        {
+            return NotFound();
+        }
+        //var categoryFromDb = _db.Categories.Find(id);
+        var addressFromDbFirst = _unitOfWork.Address.GetFirstOrDefault(u => u.id == id);
+        //var categoryFromDbSingle = _db.Categories.SingleOrDefault(u => u.Id == id);
+
+        if (addressFromDbFirst == null)
+        {
+            return NotFound();
+        }
+
+        return View(addressFromDbFirst);
+    }
+    //POST
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public IActionResult DeleteAddressPOST(int? id)
+    {
+        var obj = _unitOfWork.Address.GetFirstOrDefault(u => u.id == id);
+        if (obj == null)
+        {
+            return NotFound();
+        }
+
+        _unitOfWork.Address.Remove(obj);
+        _unitOfWork.Save();
+        TempData["success"] = "Address deleted successfully";
+        return RedirectToAction("Address");
+
+    }
+    //GET
+    public IActionResult EditAddress(int? id)
+    {
+        if (id == null || id == 0)
+        {
+            return NotFound();
+        }
+        //var categoryFromDb = _db.Categories.Find(id);
+        var addressFromDbFirst = _unitOfWork.Address.GetFirstOrDefault(u => u.id == id);
+        //var categoryFromDbSingle = _db.Categories.SingleOrDefault(u => u.Id == id);
+
+        if (addressFromDbFirst == null)
+        {
+            return NotFound();
+        }
+
+        return View(addressFromDbFirst);
+    }
+
+    //POST
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult EditAddress(Address obj)
+    
+    {
+        
+        if (ModelState.IsValid)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            obj.ApplicationUserId = claim.Value;
+            _unitOfWork.Address.Update(obj);
+            _unitOfWork.Save();
+            TempData["success"] = "Address updated successfully";
+            return RedirectToAction("Address");
+        }
+        return View(obj);
+    }
+
+
+
+
+    
+
+
 }
 
 

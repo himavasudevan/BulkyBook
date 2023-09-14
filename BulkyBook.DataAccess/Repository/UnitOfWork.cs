@@ -23,6 +23,7 @@ namespace BulkyBook.DataAccess.Repository
             OrderHeader = new OrderHeaderRepository(_db);
             OrderDetail = new OrderDetailRepository(_db);
             WishList = new WishListRepository(_db);
+            Address = new AddressRepository(_db);
         }
         public ICategoryRepository Category { get; private set; }
         public ICoverTypeRepository CoverType {  get; private set; }
@@ -35,6 +36,7 @@ namespace BulkyBook.DataAccess.Repository
         public IOrderHeaderRepository OrderHeader {  get; private set; }
         public IOrderDetailRepository OrderDetail {  get; private set; }
         public IWishListRepository WishList { get; private set; }
+        public IAddressRepository Address { get; private set; }
 
                public void Save()
         {

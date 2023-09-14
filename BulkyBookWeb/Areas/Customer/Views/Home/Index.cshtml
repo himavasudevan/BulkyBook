@@ -1,5 +1,26 @@
 ﻿@model IEnumerable<BulkyBook.Models.Product>
 
+<div class="col-md-6 offset-md-6 text-right">
+	<div class="input-group">
+		<input type="text" class="form-control" placeholder="Search" id="searchInput" style="width: 50px;">
+		<div class="input-group-append">
+			<div class="input-group-text">
+				<button type="submit" class="btn btn-primary" id="searchButton" onclick="SearchSort()">
+					<i class="bi bi-search"></i>
+				</button>
+			</div>
+		</div>
+		<div class="ml-10 mt-2">
+			<!-- Add space from the top and left -->
+			<label for="dropdown" style="display: inline-block;">Sort:</label>
+			<select class="custom-select" id="dropdown" onchange="SearchSort()">
+				<option value="ProductName">Product Name</option>
+				<option value="PrizeFromLowTohigh">Prize from low to high</option>
+				<option value="PrizeFromHighToLow">Prize from high to low</option>
+			</select>
+		</div>
+	</div>
+</div>
 
 <div class="row pb-3">
 	@foreach(var product in Model)
@@ -33,3 +54,34 @@
 		</div>
 	}
 </div>
+</div>
+<script>
+	var search = getParameterByName('SearchString');
+	
+	document.getElementById("searchInput").value = search;
+	var sort=getParameterByName('SortOrder');
+	document.getElementById("dropdown").value=sort;
+	
+
+
+	function SearchSort()
+	{
+		
+		var searchInput = document.getElementById("searchInput").value	;
+		
+		var sortInput = document.getElementById("dropdown").value;
+		window.location.href = '?SearchString=' + searchInput + '&SortOrder=' + sortInput;
+		
+	}
+	
+	function getParameterByName(name, url = window.location.href) {
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
+	
+
+</script>

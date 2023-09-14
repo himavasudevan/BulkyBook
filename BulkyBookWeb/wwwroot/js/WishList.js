@@ -36,7 +36,7 @@ function loadDataTable() {
                         return `
                         <div class="w-75 btn-group" role="group">
                         <a href="/Customer/Home/AddWishList?id=${data}&isWishListPage=true"
-                        class="btn btn-primary mx-2"> <i class="bi bi-archive"></i></a>
+                        class="btn btn-danger mx-2"> <i class="bi bi-archive"></i></a>
                       
 					</div>
                         `
