@@ -1,23 +1,27 @@
 ﻿@model IEnumerable<BulkyBook.Models.Product>
 
-<div class="col-md-6 offset-md-6 text-right">
-	<div class="input-group">
-		<input type="text" class="form-control" placeholder="Search" id="searchInput" style="width: 50px;">
-		<div class="input-group-append">
-			<div class="input-group-text">
-				<button type="submit" class="btn btn-primary" id="searchButton" onclick="SearchSort()">
-					<i class="bi bi-search"></i>
-				</button>
+<div class="row pb-3">
+	<div class="col-md-6 offset-md-6 text-right">
+		<div class="input-group">
+			<input type="text" class="form-control" placeholder="Search" id="searchInput" style="width: 200px; height: 50px;">
+			<!-- Adjust the width and height values according to your preferences -->
+			<div class="input-group-append">
+				<div class="input-group-text">
+					<button type="submit"  id="searchButton" onclick="SearchSort()" style="width: 30; height: 25px;border:0px;">
+						
+						<i class="bi bi-search"></i>
+					</button>
+				</div>
 			</div>
-		</div>
-		<div class="ml-10 mt-2">
-			<!-- Add space from the top and left -->
-			<label for="dropdown" style="display: inline-block;">Sort:</label>
-			<select class="custom-select" id="dropdown" onchange="SearchSort()">
-				<option value="ProductName">Product Name</option>
-				<option value="PrizeFromLowTohigh">Prize from low to high</option>
-				<option value="PrizeFromHighToLow">Prize from high to low</option>
-			</select>
+			<div class="ml-2">
+				<!-- Add space to the left of the sort label -->
+				<label for="dropdown">Sort:</label>
+				<select class="custom-select" id="dropdown" onchange="SearchSort()" style="width: 200px; height: 45px;">
+					<option value="ProductName">Product Name</option>
+					<option value="PriceLowToHigh">Price from low to high</option>
+					<option value="PriceHighToLow">Price from high to low</option>
+				</select>
+			</div>
 		</div>
 	</div>
 </div>

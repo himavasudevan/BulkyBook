@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace BulkyBook.DataAccess.Repository.IRepository
 {
-    public interface IApplicationUserRepository : IRepository<ApplicationUser>
-    {
-       public void Update(ApplicationUser obj);
+	public interface ICouponRepository : IRepository<Coupon>
+	{
+        void Update(Coupon obj);
     }
 }

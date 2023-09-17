@@ -1,4 +1,5 @@
-﻿using BulkyBook.DataAccess.Repository.IRepository;
+﻿using BulkyBook.DataAccess.Repository;
+using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
@@ -27,9 +28,9 @@ public class HomeController : Controller
         _unitOfWork = unitOfWork;
     }
 
-    public IActionResult Index(string SearchString="",string SortOrder="ProductName")
+    public IActionResult Index(string SearchString = "", string SortOrder = "ProductName")
     {
-		IEnumerable<Product> productList;
+        IEnumerable<Product> productList;
 
         if (string.IsNullOrWhiteSpace(SearchString))
         {
@@ -50,7 +51,7 @@ public class HomeController : Controller
             productList = productList.OrderBy(p => p.Title);
 
         }
-        else if(SortOrder == "PrizeFromHighToLow")
+        else if (SortOrder == "PrizeFromHighToLow")
         {
             productList = productList.OrderByDescending(p => p.Price);
 
@@ -122,17 +123,17 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-    public IActionResult AddWishList(int id,bool isWishListPage=false)
-                    {
+    public IActionResult AddWishList(int id,bool isWishListPage =false)
+    {
         var claimsIdentity = (ClaimsIdentity)User.Identity;
         var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
         var existingWishListItem = _unitOfWork.WishList.GetFirstOrDefault(w => w.ProductId == id && w.ApplicationUserId == claim.Value);
         if (existingWishListItem != null)
         {
-            
-                _unitOfWork.WishList.Remove(existingWishListItem);
+
+            _unitOfWork.WishList.Remove(existingWishListItem);
             _unitOfWork.Save();
-           
+
             TempData["error"] = "Product removed from wish list";
             if (isWishListPage == false)
             {
@@ -146,18 +147,18 @@ public class HomeController : Controller
         }
         else
         {
-            
 
-                _unitOfWork.WishList.Add(new WishList() { ProductId = id, ApplicationUserId = claim.Value });
-                _unitOfWork.Save();
-                TempData["success"] = "Product Added to wish list";
 
-                return RedirectToAction("Details", new { ProductId = id });
-            
+            _unitOfWork.WishList.Add(new WishList() { ProductId = id, ApplicationUserId = claim.Value });
+            _unitOfWork.Save();
+            TempData["success"] = "Product Added to wish list";
+
+            return RedirectToAction("Details", new { ProductId = id });
+
         }
-        
-        
-        
+
+
+
 
     }
     public IActionResult WishList()
@@ -178,22 +179,32 @@ public class HomeController : Controller
         return View();
 
     }
+    public IActionResult ChangeAddress(int id)
+    {
+        ViewData["OrderId"] = id;
+        return View();
+
+    }
     public IActionResult GetAddress()
     {
 
         var claimsIdentity = (ClaimsIdentity)User.Identity;
         var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-        var AddressDetails = _unitOfWork.Address.GetAll(w => w.ApplicationUserId == claim.Value, includeProperties: "ApplicationUser");
-        return Json(new { data = AddressDetails });
+        var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(P => P.Id.Equals(claim.Value));
+        var defaultAddress = new Address() { City = user.City, Name = user.Name, PhoneNumber = user.PhoneNumber, PostalCode = user.PostalCode, State = user.State, StreetAddress = user.StreetAddress };
+        var AddressDetails = _unitOfWork.Address.GetAll(w => w.ApplicationUserId == claim.Value, includeProperties: "ApplicationUser").ToList();
+        AddressDetails.Add(defaultAddress);
+
+        return Json(new { data = AddressDetails.OrderBy(p => p.id) });
     }
     //GET
-   public IActionResult AddAddress()
+    public IActionResult AddAddress()
     {
-        
+
         return View();
 
     }
-    
+
 
     //POST
     [HttpPost]
@@ -201,18 +212,18 @@ public class HomeController : Controller
     public IActionResult AddAddress(Address obj)
     {
 
-            if (ModelState.IsValid)
+        if (ModelState.IsValid)
         {
 
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             obj.ApplicationUserId = claim.Value;
             _unitOfWork.Address.Add(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Address Added successfully";
-                return RedirectToAction("Address");
-            }
-        
+            _unitOfWork.Save();
+            TempData["success"] = "Address Added successfully";
+            return RedirectToAction("Address");
+        }
+
         return View(obj);
     }
     //public IActionResult Index1()
@@ -257,10 +268,21 @@ public class HomeController : Controller
     //GET
     public IActionResult EditAddress(int? id)
     {
-        if (id == null || id == 0)
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (id == null)
         {
             return NotFound();
         }
+        if (id == 0)
+        {
+            var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(P => P.Id.Equals(claim.Value));
+            var defaultAddress = new Address() { City = user.City, Name = user.Name, PhoneNumber = user.PhoneNumber, PostalCode = user.PostalCode, State = user.State, StreetAddress = user.StreetAddress };
+
+            return View(defaultAddress);
+        }
+
         //var categoryFromDb = _db.Categories.Find(id);
         var addressFromDbFirst = _unitOfWork.Address.GetFirstOrDefault(u => u.id == id);
         //var categoryFromDbSingle = _db.Categories.SingleOrDefault(u => u.Id == id);
@@ -277,26 +299,90 @@ public class HomeController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult EditAddress(Address obj)
-    
+
     {
-        
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
         if (ModelState.IsValid)
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            obj.ApplicationUserId = claim.Value;
-            _unitOfWork.Address.Update(obj);
-            _unitOfWork.Save();
-            TempData["success"] = "Address updated successfully";
-            return RedirectToAction("Address");
+            if (obj.id == 0)
+            {
+
+                var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(P => P.Id.Equals(claim.Value));
+                user.PhoneNumber = obj.PhoneNumber;
+                user.City = obj.City;
+                user.PostalCode = obj.PostalCode;
+                user.StreetAddress = obj.StreetAddress;
+                user.State = obj.State;
+                _unitOfWork.ApplicationUser.Update(user);
+                _unitOfWork.Save();
+
+                return RedirectToAction("Address");
+
+
+            }
+            else
+            {
+
+
+
+
+
+                obj.ApplicationUserId = claim.Value;
+                _unitOfWork.Address.Update(obj);
+                _unitOfWork.Save();
+                TempData["success"] = "Address updated successfully";
+                return RedirectToAction("Address");
+            }
         }
         return View(obj);
     }
 
+//public ActionResult SelectAddress(int? id,int? orderId) {
+
+
+//             if (id == 0)
+//              {
+//                var claimsIdentity = (ClaimsIdentity)User.Identity;
+//                  var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+//                   var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(P => P.Id.Equals(claim.Value));
+                            
+//                   var orderaddress= _unitOfWork.OrderHeader.GetFirstOrDefault(p => p.Id == orderId );
+//                orderaddress.PhoneNumber= user.PhoneNumber;
+//                orderaddress.City= user.City;
+//                orderaddress.PostalCode= user.PostalCode;
+//                orderaddress.StreetAddress= user.StreetAddress;
+//                orderaddress.State= user.State;
+//                 _unitOfWork.OrderHeader.Update(orderaddress);
+//                 _unitOfWork.Save();
+
+//            return RedirectToAction("Cart", "Summary");
+
+//        }
+//        else
+//        {
+            
+//           var orderaddress=_unitOfWork.OrderHeader.GetFirstOrDefault(p=>p.Id == orderId);
+//          var address=  _unitOfWork.Address.GetFirstOrDefault(p => p.id == id);
+//            orderaddress.PhoneNumber= address.PhoneNumber;
+//            orderaddress.City=address.City ;
+//            orderaddress.PostalCode= address.PostalCode  ;
+//            orderaddress.StreetAddress= address.StreetAddress  ;
+//            orderaddress.State= address.State ;
+            
+//            _unitOfWork.OrderHeader.Update(orderaddress);
+//            _unitOfWork.Save();
+//            return RedirectToAction("Cart", "Summary");
+
+//        }
+        
+
+//    }
 
 
 
-    
 
 
 }

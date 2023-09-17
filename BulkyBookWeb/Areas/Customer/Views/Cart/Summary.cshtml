@@ -79,6 +79,11 @@
 									<input asp-for="OrderHeader.PostalCode" class="form-control" />
 									<span asp-validation-for="OrderHeader.PostalCode" class="text-danger"></span>
 								</div>
+								<div>
+								<a asp-controller="Home" asp-route-id="@Model.OrderHeader.Id"     asp-action="ChangeAddress"  style="width:400px">
+									Change Address
+								</a>
+								</div>
 							</div>
 						</div>
 						<div class="col-12 col-lg-5 offset-lg-1">

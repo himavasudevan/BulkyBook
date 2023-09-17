@@ -25,6 +25,11 @@ function loadDataTable() {
             {
                 "data": "id",
                 "render": function (data) {
+
+                    if (data == 0) {
+                        return '';
+                    }
+                   
                     return `
                         <div class="w-75 btn-group" role="group">
                         <a href="/Customer/Home/DeleteAddress?id=${data}"

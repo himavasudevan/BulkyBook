@@ -46,7 +46,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             return View(ShoppingCartVM);
         }
 
-        public IActionResult Summary()
+        public IActionResult Summary(int? addressId=-1)
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
@@ -55,26 +55,48 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             {
                 ListCart = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == claim.Value,
                 includeProperties: "Product"),
-                OrderHeader= new()
+                OrderHeader = new()
             };
-            ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(
-                u => u.Id == claim.Value);
+            if (addressId <=0) {
+                
+                ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(
+                    u => u.Id == claim.Value);
+            
 
-            ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
-            ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
-            ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
-            ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
-            ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
-            ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+                ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
+                ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
+                ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
+                ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
+                ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
+                ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
+
+            }
+            
+
+            
+             else if (addressId > 0)
+            {
+
+                var address = _unitOfWork.Address.GetFirstOrDefault(p => p.id == addressId);
+                ShoppingCartVM.OrderHeader.Name = address.Name;
+                ShoppingCartVM.OrderHeader.PhoneNumber = address.PhoneNumber;
+                ShoppingCartVM.OrderHeader.PostalCode = address.PostalCode;
+                ShoppingCartVM.OrderHeader.State = address.State;
+                ShoppingCartVM.OrderHeader.StreetAddress = address.StreetAddress;
+                ShoppingCartVM.OrderHeader.City = address.City;
 
 
 
-            foreach (var cart in ShoppingCartVM.ListCart)
+
+
+            }
+            foreach(var cart in ShoppingCartVM.ListCart)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart.Count, cart.Product.Price,
                     cart.Product.Price50, cart.Product.Price100);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
+
             return View(ShoppingCartVM);
         }
 

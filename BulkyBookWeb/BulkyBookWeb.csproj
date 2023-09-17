@@ -14,6 +14,7 @@
     <Content Remove="Areas\Admin\Views\Product\image.cshtml" />
     <Content Remove="Areas\Customer\Views\Home\ViewWishList.cshtml" />
     <Content Remove="wwwroot\js\JavaScript.js" />
+    <Content Remove="wwwroot\js\JavaScript1.js" />
   </ItemGroup>
 
   <ItemGroup>
