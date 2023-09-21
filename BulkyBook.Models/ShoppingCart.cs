@@ -27,5 +27,10 @@ namespace BulkyBook.Models
 
         [NotMapped]
         public double Price { get; set; }
-    }
+		public int? CouponId { get; set; }
+		[ForeignKey("CouponId")]
+		[ValidateNever]
+		public virtual Coupon? Coupon { get; set; }
+		public double CouponAmount { get; set; }
+	}
 }

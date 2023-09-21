@@ -10,6 +10,8 @@ namespace BulkyBook.Models
 {
 	public class Coupon : IValidatableObject
     {
+
+		[Key]
 		public int Id { get; set; }
         [Display(Name = "Start Date"), DataType(DataType.Date), Required]
         public DateTime StartDate { get; set; }

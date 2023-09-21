@@ -43,5 +43,11 @@ namespace BulkyBook.Models
         public string PostalCode { get; set; }
         [Required]
         public string Name { get; set; }
-    }
+        public int? CouponId { get; set; }
+		[ForeignKey("CouponId")]
+		[ValidateNever]
+		public virtual  Coupon? Coupon { get; set; }
+        public double CouponAmount { get; set; }
+        public bool CashOnDelivery { get; set; }
+	}
 }

@@ -4,6 +4,7 @@ using BulkyBook.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBook.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230917214008_OrderCouponNullable")]
+    partial class OrderCouponNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,9 +210,6 @@ namespace BulkyBook.DataAccess.Migrations
                     b.Property<string>("Carrier")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("CashOnDelivery")
-                        .HasColumnType("bit");
-
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -218,6 +218,7 @@ namespace BulkyBook.DataAccess.Migrations
                         .HasColumnType("float");
 
                     b.Property<int?>("CouponId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -374,20 +375,12 @@ namespace BulkyBook.DataAccess.Migrations
                     b.Property<int>("Count")
                         .HasColumnType("int");
 
-                    b.Property<double>("CouponAmount")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("CouponId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("CouponId");
 
                     b.HasIndex("ProductId");
 
@@ -693,7 +686,9 @@ namespace BulkyBook.DataAccess.Migrations
 
                     b.HasOne("BulkyBook.Models.Coupon", "Coupon")
                         .WithMany()
-                        .HasForeignKey("CouponId");
+                        .HasForeignKey("CouponId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApplicationUser");
 
@@ -738,10 +733,6 @@ namespace BulkyBook.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BulkyBook.Models.Coupon", "Coupon")
-                        .WithMany()
-                        .HasForeignKey("CouponId");
-
                     b.HasOne("BulkyBook.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
@@ -749,8 +740,6 @@ namespace BulkyBook.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
-
-                    b.Navigation("Coupon");
 
                     b.Navigation("Product");
                 });

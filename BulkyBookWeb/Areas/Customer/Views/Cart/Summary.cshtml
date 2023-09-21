@@ -2,6 +2,7 @@
 @using Microsoft.Extensions.Options
 @inject IOptions<BulkyBook.Utility.StripeSettings> Stripe
 
+
 <form method="post">
 	<br />
 	<div class="container">
@@ -79,12 +80,27 @@
 									<input asp-for="OrderHeader.PostalCode" class="form-control" />
 									<span asp-validation-for="OrderHeader.PostalCode" class="text-danger"></span>
 								</div>
-								<div>
-								<a asp-controller="Home" asp-route-id="@Model.OrderHeader.Id"     asp-action="ChangeAddress"  style="width:400px">
+								
+							</div>
+							
+
+							<div class="row my-1">
+								<div class="col-3">
+								<input type="text" class="form-control" placeholder=" Coupen Code" id="searchInput" style="width: 150px; height: 50px;">
+							</div>
+							<div class="col-9">
+									<button type="button" class="btn btn-light" id="applyCoupon" >Apply</button>
+
+								</div>
+							<div id="CouponResult"></div>
+							</div>
+							
+							<div>
+								<a asp-controller="Home" asp-route-id="@Model.OrderHeader.Id" asp-action="ChangeAddress" style="width:400px">
 									Change Address
 								</a>
-								</div>
 							</div>
+
 						</div>
 						<div class="col-12 col-lg-5 offset-lg-1">
 							<h4 class="d-flex justify-content-between align-items-center mb-3">
@@ -101,12 +117,29 @@
 									<span class="text-muted">@((details.Price * details.Count).ToString("c")) </span>
 								</li>
 								}
+
+								<li class="list-group-item d-flex justify-content-between bg-light">
+									<small class="text-info">Coupon Amount (USD)</small>
+									<strong class="text-info" id="couponAmount"></strong>
+								</li>
+
 								<li class="list-group-item d-flex justify-content-between bg-light">
 									<small class="text-info">Total (USD)</small>
-									<strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c")</strong>
+									<strong class="text-info" id="orderTotalElement">@Model.OrderHeader.OrderTotal.ToString("c")</strong>
 								</li>
 							</ul>
 						</div>
+						<div class="col-12">
+							<!-- Add space between the summary table and the label/checkbox -->
+							<div style="margin-top: 20px;"></div>
+
+							<!-- Label for Cash On Delivery -->
+							<label for="cashOnDelivery">Cash On Delivery</label>
+
+							<!-- Checkbox for Cash On Delivery -->
+							<input type="checkbox" id="cashOnDelivery" name="cashOnDelivery" value="true">
+						</div>
+						
 					</div>
 				</div>
 			</div>
@@ -125,4 +158,31 @@
 		</div>
 	</div>
 </form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	
+	<script>
+		$(document).ready(function () {
+		$("#applyCoupon").click(function () {
+			var couponCode = $("#searchInput").val();
+			var url = '/Customer/Cart/CouponValidation?CouponCode='+couponCode;
+
+			$.ajax({
+				type: "GET",
+				url: url,
+				
+				success: function (result) {
+					//$("#CouponResult").html(result);
+					
+					$("#orderTotalElement").text(result.orderHeader.orderTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+					$("#couponAmount").text(result.orderHeader.couponAmount.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
+
+				},
+				error: function (result) {
+					console.log(result);
+					$("#CouponResult").html(result.responseText);
+				}
+			});
+		});
+	});
+</script>
 
