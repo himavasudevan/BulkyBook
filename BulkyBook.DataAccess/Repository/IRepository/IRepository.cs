@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BulkyBook.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,9 +19,10 @@ namespace BulkyBook.DataAccess.Repository.IRepository
 
 
          bool IsDuplicate(string property,string value);
-        
 
-     
+
+       
+
     }
-   
+
 }

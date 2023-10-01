@@ -25,6 +25,7 @@ namespace BulkyBook.DataAccess.Repository
             WishList = new WishListRepository(_db);
             Address = new AddressRepository(_db);
             Coupon=new CouponRepository(_db);
+            ProductReview = new ProductReviewRepository(_db);
         }
         public ICategoryRepository Category { get; private set; }
         public ICoverTypeRepository CoverType {  get; private set; }
@@ -39,8 +40,9 @@ namespace BulkyBook.DataAccess.Repository
         public IWishListRepository WishList { get; private set; }
         public IAddressRepository Address { get; private set; }
         public ICouponRepository Coupon { get; private set; }
+        public IProductReviewRepository ProductReview { get; private set; }
 
-               public void Save()
+               public void Save() 
         {
             _db.SaveChanges();
         }

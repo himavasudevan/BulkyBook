@@ -1,0 +1,135 @@
+﻿@model InvoiceVM
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .invoice-header {
+            text-align: center;
+        }
+
+        .invoice-details {
+            margin-top: 20px;
+        }
+
+            .invoice-details table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .invoice-details th,
+            .invoice-details td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }
+
+        .invoice-footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Add this CSS rule */
+        .shipping-address p {
+            margin: 5px 0;
+        }
+
+        /* Add this CSS rule to hide the CouponAmount column */
+        .invoice-details .coupon-amount {
+            display: none;
+        }
+
+        /* Add this CSS rule to display the CouponAmount near Grand Total */
+        .coupon-amount-label {
+            display: none;
+        }
+
+        /* Add this CSS rule to display CouponAmount only when it's greater than zero */
+        .show-coupon-amount .coupon-amount-label {
+            display: inline;
+        }
+
+        /* Add this CSS rule to style the Grand Total */
+        .grand-total {
+            font-size: 24px; /* Adjust the font size as needed */
+            font-weight: bold; /* Make it bold */
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice</h1>
+        </div>
+
+        <!-- Shipping Address Section -->
+        <div class="shipping-address">
+            <h4>Shipping Address:</h4>
+            <p> @Model.OrderHeader.Name</p>
+            <p> @Model.OrderHeader.StreetAddress</p>
+            <p> @Model.OrderHeader.City</p>
+            <p>  @Model.OrderHeader.State</p>
+            <p>  @Model.OrderHeader.PostalCode</p>
+           
+        </div>
+
+        <div class="invoice-details">
+            <table>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+
+                @foreach (var orderDetail in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@orderDetail.Product.Title</td>
+                        <td>@orderDetail.Count</td>
+                        <td>@orderDetail.Product.Price.ToString("c")</td>
+                        <td>@(orderDetail.Count * orderDetail.Product.Price)</td>
+                    </tr>
+                }
+               
+
+            </table>
+        </div>
+
+        <!-- Coupon Amount and Grand Total -->
+        <div class="invoice-footer">
+            @if (Model.OrderHeader.CouponAmount > 0)
+            {
+                <p>Coupon Amount: $@Model.OrderHeader.CouponAmount</p>
+            }
+            <p class="grand-total">Grand Total: $@Model.OrderHeader.OrderTotal</p>
+            @if (Model.OrderHeader.CashOnDelivery)
+            {
+                <p>Payment Mode: Cash On Delivery</p>
+            }
+            else
+            {
+                <p>Payment Mode: Card Payment</p>
+            }
+        </div>
+
+    </div>
+</body>
+</html>

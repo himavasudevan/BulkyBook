@@ -4,6 +4,7 @@ using BulkyBook.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BulkyBook.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230923204637_addeddd")]
+    partial class addeddd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -376,9 +379,6 @@ namespace BulkyBook.DataAccess.Migrations
 
                     b.Property<DateTime>("ReviewDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ReviewRating")
-                        .HasColumnType("int");
 
                     b.Property<string>("ReviewText")
                         .IsRequired()

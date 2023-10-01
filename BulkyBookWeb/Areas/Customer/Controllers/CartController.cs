@@ -79,7 +79,9 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
 
 
-			else if (addressId > 0)
+			else
+			
+			if (addressId > 0)
 			{
 
 				var address = _unitOfWork.Address.GetFirstOrDefault(p => p.id == addressId);
@@ -239,7 +241,24 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 		public IActionResult OrderConfirmation(int id)
 		{
 			OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == id, includeProperties: "ApplicationUser");
-			if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+			
+			var orderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderId == id, includeProperties: "Product");
+
+
+			foreach (var item in orderDetail)
+			{
+				var count = item.Count;
+				item.Product.Stock = item.Product.Stock - count;
+			}
+
+				
+
+				_unitOfWork.Save();
+			
+
+
+
+            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
 			{
 				var service = new SessionService();
 				Session session = service.Get(orderHeader.SessionId);
@@ -381,6 +400,10 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 			return new JsonResult(ShoppingCartVM);
 			
 		}
+		public IActionResult Invoice() {
+			return View();
+		
+		}
 
 		private double GetPriceBasedOnQuantity(double quantity, double price, double price50, double price100)
 		{
@@ -397,5 +420,6 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 				return price100;
 			}
 		}
+
 	}
 }

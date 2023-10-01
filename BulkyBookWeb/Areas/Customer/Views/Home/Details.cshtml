@@ -1,15 +1,29 @@
 ﻿@model ShoppingCart
+
 <link rel="stylesheet" href="~/css/StyleSheet.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+    .orange-star {
+        color: orange !important; /* Add !important to ensure the color takes precedence */
+    }
+</style>
+
+
+<div class="container mt-4">
 
 <form method="post">
     <input hidden asp-for="ProductId" />
     <div class="card  container pt-4">
         <div class="card-header bg-primary text-light ml-0  row ">
             <div class="col-12 col-md-6">
-                <h1 class="text-white-50">@Model.Product.Title  <a id="addToWishListBtn" asp-controller="home" asp-action="AddWishList" class="btn btn-primary" asp-route-id="@Model.Product.Id"><i  class="bi bi-heart"></i> </a> </h1>
+                <h1 class="text-white-50">@Model.Product.Title  <a id="addToWishListBtn" asp-controller="home" asp-action="AddWishList" class="btn btn-primary" asp-route-id="@Model.Product.Id"><i class="bi bi-heart"></i> </a> </h1>
                 <p class="text-warning">by @Model.Product.Author</p>
-                
+
             </div>
             <div class="col-12 col-md-6 text-end pt-4">
                 <span class="badge bg-info pt-2" style="height:30px;">@Model.Product.CoverType.Name</span>
@@ -60,22 +74,31 @@
                         </div>
                         <div class="row pl-2">
                             <div class="col-2 text-primary"><h4>Count</h4></div>
-                            <div class="col-10"><input asp-for="Count" class="form-control" max="@Model.Product.Stock"/></div>
+                            <div class="col-10"><input asp-for="Count" class="form-control" max="@Model.Product.Stock" /></div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-3 offset-lg-1 text-center">
                         @*<img src="@Model.Product.ImageUrl" width="100%" class="rounded" />*@
 
-                        <div class="container1">
+                        <div id="myLightGallery" class="container1">
                             <div class="swiper">
                                 <!-- Additional required wrapper -->
-                                <div class="swiper-wrapper">
+                                <div class="swiper-wrapper" id="swiper-wrapper">
+
                                     <!-- Slides -->
-                                    <div class="swiper-slide"><img src="@Model.Product.ImageUrl" width="100%" style="height:300px" class=" rounded"></div>
+                                    <div class="swiper-slide">
+                                        <a href="@Model.Product.ImageUrl" data-fancybox="images" data-fancybox-thumb="@Model.Product.ImageUrl">
+                                            <img src="@Model.Product.ImageUrl" width="100%" style="height:300px" class="rounded">
+                                        </a>
+                                    </div>
 
                                     @foreach (var image in Model.Product.ProductImages)
                                     {
-                                        <div class="swiper-slide"><img src="@image.ImageUrl" width="100%" style="height:300px" class="rounded"></div>
+                                        <div class="swiper-slide">
+                                            <a href="@image.ImageUrl" data-fancybox="images" data-fancybox-thumb="@image.ImageUrl">
+                                                <img src="@image.ImageUrl" width="100%" style="height:300px" class="rounded">
+                                            </a>
+                                        </div>
                                     }
 
                                 </div>
@@ -87,13 +110,13 @@
                                 <div class="swiper-button-next"></div>
                             </div>
                         </div>
-                    
-                    
-                    
 
+
+
+
+                    </div>
                 </div>
             </div>
-        </div>
         </div>
 
         <div class="card-footer">
@@ -108,51 +131,223 @@
         </div>
     </div>
 </form>
-<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
-<script>
-    const swiper = new Swiper('.swiper', {
-        // Optional parameters
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-        loop: true,
-
-        // If we need pagination
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-
-        // Navigation arrows
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-
-        // And if we need scrollbar
-
-    });
 
     
-       
-        document.addEventListener("DOMContentLoaded", function () {
-            const addToWishListBtn = document.getElementById("addToWishListBtn");
-            const heartIcon = addToWishListBtn.querySelector(".bi-heart");
+   
 
-            // Add a click event listener to handle adding to the wish list
-            addToWishListBtn.addEventListener("click", function () {
-                // Toggle the button class
-                addToWishListBtn.classList.toggle("success-button"); // Apply the success color class
+    <!-- Rest of your HTML content -->
+    @*//Product Review Form *@
+    <!-- Product Review Form -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Add a Review</h3>
 
-                // Toggle the heart icon class
-                heartIcon.classList.toggle("bi-heart");
-                heartIcon.classList.toggle("bi-heart-fill"); // Change to your desired filled heart icon
+            @{
+                bool allowReview = TempData["AllowReview"] as bool? ?? false;
+            }
 
-                // Log a message to the console for debugging
-                console.log("Button clicked. Class and icon toggled.");
-            });
+           
+            @if(allowReview)
+            {
+
+                <form id="reviewForm">
+                    <input type="hidden" asp-for="Id" value="0" />
+                    <input type="hidden" asp-for="ProductId" value="@Model.Product.Id" />
+
+
+                    <div class="form-group">
+                        <label for="ReviewTitle">Title:</label>
+                        <input type="text" class="form-control" id="ReviewTitle" name="ReviewTitle" required />
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group">
+                        <label for="Rating">Rating:</label>
+                        <input type="hidden" id="ReviewRating" name="ReviewRating">
+                        <span class="fa fa-star "></span>
+                        <span class="fa fa-star "></span>
+                        <span class="fa fa-star "></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group">
+                        <label for="Review_Text">Review:</label>
+                        <textarea class="form-control" id="ReviewText" name="ReviewText" rows="4" required></textarea>
+                    </div>
+                   
+
+                    <button type="button" class="btn btn-primary" id="submitReview">Submit Review</button>
+                </form>
+
+            }
+            else
+            {
+                <p>You must make a purchase to leave a review</p>
+            }
+
+            <div id="reviewResult" style="display: none;"></div>
+           
+        </div>
+        <!-- Display Product Reviews -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Product Reviews</h2>
+                <ul class="list-group">
+                    @foreach (var review in ViewBag.ProductReviews)
+                    {
+                        <li class="list-group-item">
+                            <h4>@review.ReviewTitle</h4>
+                            <p>Rating:
+                                @for ( int i = 0;i<review.ReviewRating;i++)
+                                {
+
+                                    <span class="fa fa-star"></span>
+
+
+                                }
+                            </p>
+                            <p>Review by: @review.ApplicationUser.Name</p>
+                            <p>@review.ReviewDate.ToString("MMMM dd, yyyy")</p>
+                            <p>@review.ReviewText</p>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+<script>
+
+
+
+
+
+
+
+
+    $(document).ready(function () {
+
+        $(".fa-star").click(function () {
+            // Toggle the orange-star class when a star is clicked
+            $(this).toggleClass("orange-star");
+
+            // Optionally, you can set all previous stars to be orange as well
+            $(this).prevAll().addClass("orange-star");
+
+            // Remove orange-star class from stars that come after the clicked one
+            $(this).nextAll().removeClass("orange-star");
+
+            // Update the hidden input with the selected rating
+            var rating = $(".fa-star.orange-star").length;
+            
+            $("#ReviewRating").val(rating);
         });
+       
+
+        $("#submitReview").click(function () {
+            // Serialize the form data
+            var formData = $("#reviewForm").serialize();
+
+            $.ajax({
+                type: "POST",
+                url: '/Customer/ProductReview/Create', // Adjust the URL to match your controller action
+                data: formData,
+                success: function (result) {
+                    if (result.savedObject) {
+                        // Access the saved review object
+                        var savedReview = result.savedObject;
+
+                        // Update your form or display the saved review
+                        $("#Review_Title").val(savedReview.reviewTitle);
+                        $("#Review_Text").val(savedReview.reviewText);
+                        var newReviewHtml = `
+                            <li class="list-group-item">
+                                <h4>${savedReview.reviewTitle}</h4>
+                                <p>Rating: ${'*'.repeat(savedReview.reviewRating)}</p>
+                                <p>Review by: ${savedReview.applicationUserId}</p>
+                                <p>${savedReview.reviewDate}</p>
+                                <p>${savedReview.reviewText}</p>
+                            </li>
+                        `;
+                        $(".list-group").prepend(newReviewHtml);
+
+                        // Display a success message
+                        $("#reviewResult").html("<p class='text-success'>"+result.message+"</p>").show();
+                    } else {
+                        // Handle the case where the review was not saved
+                        $("#reviewResult").html("<p class='text-danger'>"+result.message+"</p>").show();
+                    }
+                },
+                error: function (result) {
+                    // Display an error message, if any
+                    $("#reviewResult").html("<p class='text-danger'>Error submitting the review.</p>").show();
+                }
+            });
+
+        });
+        const swiper = new Swiper('.swiper', {
+            // Optional parameters
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            loop: true,
+
+            // If we need pagination
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+
+            // And if we need scrollbar
+
+        });
+
+
+
+
+
+        $('[data-fancybox="images"]').fancybox({
+            thumbs: {
+                autoStart: true, // Display thumbnails by default
+            },
+        });
+
+
+        const addToWishListBtn = document.getElementById("addToWishListBtn");
+        const heartIcon = addToWishListBtn.querySelector(".bi-heart");
+
+        // Add a click event listener to handle adding to the wish list
+        addToWishListBtn.addEventListener("click", function () {
+            // Toggle the button class
+            addToWishListBtn.classList.toggle("success-button"); // Apply the success color class
+
+            // Toggle the heart icon class
+            heartIcon.classList.toggle("bi-heart");
+            heartIcon.classList.toggle("bi-heart-fill"); // Change to your desired filled heart icon
+
+            // Log a message to the console for debugging
+            console.log("Button clicked. Class and icon toggled.");
+        });
+    });
+
+
+
+    
+
 </script>
 
 
+
+                   

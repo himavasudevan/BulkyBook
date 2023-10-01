@@ -101,6 +101,8 @@ namespace BulkyBook.DataAccess.Repository
         //	return dbSet.Any(entity => entity.GetType().GetProperty(property)?.GetValue(entity)?.ToString() == value);
         //}
 
+        
+
 
     }
 }

@@ -22,4 +22,5 @@ public class ApplicationDbContext :IdentityDbContext
     public DbSet<WishList>WishLists { get; set; }
     public DbSet<Address>Addresses { get; set; }
     public DbSet<Coupon>Coupons { get; set; }
+    public DbSet<ProductReview> ProductReviews { get; set; }
 }

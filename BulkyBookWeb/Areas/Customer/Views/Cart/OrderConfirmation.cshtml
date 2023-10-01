@@ -9,7 +9,10 @@
     <div class="col-12 text-center" style="color:maroon">
         <br />
         Your order has been placed successfully! <br />
-        
-    </div>
+        <a asp-area="Customer" asp-controller="Invoice" asp-action="Index" asp-route-orderId="@Model" class="btn btn-secondary">View Invoice</a>
+       @* <a href="@Url.Action("Invoice", "Index", new { area = "Customer", orderId = Model })" class="btn btn-secondary">View Invoice</a>
+    </div>*@
+
 </div> 
+
 

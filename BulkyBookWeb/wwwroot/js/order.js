@@ -31,6 +31,7 @@ function loadDataTable(status)
         "ajax": {
             "url": "/Admin/Order/GetAll?status=" + status
         },
+        order: [[0, 'desc']],
         "columns": [
             { "data": "id", "width": "5%" },
             { "data": "name", "width": "25%" },

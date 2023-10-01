@@ -229,7 +229,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             }
 
 
-            return Json(new { data = orderHeaders });
+            return Json(new { data = orderHeaders});
         }
         #endregion
     }

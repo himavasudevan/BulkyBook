@@ -70,16 +70,38 @@ public class HomeController : Controller
 
     public IActionResult Details(int productId)
     {
-        ShoppingCart cartObj = new()
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+        bool allowReview = false;
+        
+        if (claim != null)
         {
-            Count = 1,
-            ProductId = productId,
-            Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType,ProductImages"),
-        };
+            var order= _unitOfWork.OrderDetail.GetFirstOrDefault(p => p.ProductId == productId &&p.OrderHeader.ApplicationUserId==claim.Value);
+            if(order != null)
+            {
+                allowReview = true;
+            }
+        }
+        TempData["AllowReview"] = allowReview;
 
 
-        return View(cartObj);
-    }
+
+        var reviews=_unitOfWork.ProductReview.GetAll(p=>p.ProductId==productId,includeProperties:"ApplicationUser").ToList();
+        ViewBag.ProductReviews = reviews;
+       
+        ShoppingCart cartObj = new()
+            {
+                Count = 1,
+                ProductId = productId,
+                Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType,ProductImages"),
+            };
+
+
+
+            return View(cartObj);
+        }
+    
 
     [HttpPost]
     [ValidateAntiForgeryToken]
