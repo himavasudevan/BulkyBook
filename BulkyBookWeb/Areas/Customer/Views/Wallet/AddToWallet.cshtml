@@ -1,0 +1,52 @@
+﻿@model BulkyBook.Models.ViewModels.AddFundVM
+
+
+@{
+    ViewBag.Title = "Add Funds";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="text-center">Add Funds to Wallet</h2>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("AddFunds", "Wallet", FormMethod.Post))
+                    {
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label" })
+                            @Html.TextBoxFor(model => model.Amount, new { @class = "form-control" })
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" id="addFundsButton" class="btn btn-success">Add Funds</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // Function to set the amount in the TextBox
+        function setAmount(amount) {
+            document.getElementById("Amount").value = "$" + amount.toFixed(2);
+        }
+
+        // Check for the Stripe session URL in TempData
+        var stripeSessionUrl = "@TempData["StripeSessionUrl"]";
+
+        // If a Stripe session URL is present, set the amount and redirect to Stripe
+        if (stripeSessionUrl) {
+            var amountToAdd = parseFloat("@Model.Amount");
+            setAmount(amountToAdd);
+            // Disable the "Add Funds" button to prevent additional submissions
+            document.getElementById("addFundsButton").disabled = true;
+            // Redirect to the Stripe payment page
+            window.location.href = stripeSessionUrl;
+        }
+    </script>
+}

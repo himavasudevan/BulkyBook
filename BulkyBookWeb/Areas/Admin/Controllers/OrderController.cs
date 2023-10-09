@@ -45,6 +45,8 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Details_PAY_NOW()
         {
+
+
             OrderVM.OrderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id, includeProperties: "ApplicationUser");
             OrderVM.OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderId == OrderVM.OrderHeader.Id, includeProperties: "Product");
 
@@ -165,12 +167,68 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
         }
 
-        [HttpPost]
+        private double CalculateRefundAmount(OrderHeader orderHeader)
+        {
+            
+
+            double refundAmount = orderHeader.OrderTotal;
+
+           
+
+               
+            
+
+            return refundAmount;
+        }
+
+        private void  UpdateWalletBalance(double refundAmount, string userId)
+        {
+
+
+            var wallet = _unitOfWork.Wallet.GetFirstOrDefault(w => w.ApplicationUserId == userId);
+
+            if (wallet != null)
+            {
+                // Update the wallet balance by adding the refund amount
+
+                wallet.Balance += refundAmount;
+               
+                _unitOfWork.Wallet.Update(wallet);
+                _unitOfWork.Save();
+
+            }
+            else
+            {
+
+
+
+
+                var newWallet = new Wallet
+                {
+
+
+                    ApplicationUserId = userId,
+                    Balance = refundAmount,
+                    CreatedDate = DateTime.Now
+
+                    };
+                    _unitOfWork.Wallet.Add(newWallet);
+                    _unitOfWork.Save();
+
+                }
+
+        }
+
+            [HttpPost]
         [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
         [ValidateAntiForgeryToken]
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+        
         public IActionResult CancelOrder()
         {
             var orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id, tracked: false);
+
             if (orderHeader.PaymentStatus == SD.PaymentStatusApproved)
             {
                 var options = new RefundCreateOptions
@@ -181,18 +239,46 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
 
                 var service = new RefundService();
                 Refund refund = service.Create(options);
+            }
 
-                _unitOfWork.OrderHeader.UpdateStatus(orderHeader.Id, SD.StatusCancelled, SD.StatusRefunded);
-            }
-            else
-            {
-                _unitOfWork.OrderHeader.UpdateStatus(orderHeader.Id, SD.StatusCancelled, SD.StatusCancelled);
-            }
+            // Calculate the refund amount based on the canceled order
+            double refundAmount = CalculateRefundAmount(orderHeader); // Implement this method
+
+            // Update the wallet balance with the refund amount
+
+            //return RedirectToAction("UpdateWalletBalance", "Wallet", new { refundAmount=refundAmount, userId=orderHeader.ApplicationUserId, area="Customer" });
+
+            // Update order status
+
+            UpdateWalletBalance(refundAmount, orderHeader.ApplicationUserId);
+            _unitOfWork.OrderHeader.UpdateStatus(orderHeader.Id, SD.StatusCancelled, SD.StatusRefunded);
             _unitOfWork.Save();
+
+            var wallet=_unitOfWork.Wallet.GetFirstOrDefault(p=>p.ApplicationUserId== orderHeader.ApplicationUserId);
+
+            var walletTransaction = new WalletTransaction
+            {
+                WalletId = wallet.WalletId,
+                TransactionDate = DateTime.Now,
+                TransactionAmount = refundAmount,
+                OrderId=orderHeader.Id,
+                description="Order cancellation refund"
+
+
+
+
+            };
+            _unitOfWork.WalletTransaction.Add(walletTransaction);
+            _unitOfWork.Save();
+
 
             TempData["Success"] = "Order Cancelled Successfully.";
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
+
+
+
         }
+
 
         #region API CALLS
         [HttpGet]

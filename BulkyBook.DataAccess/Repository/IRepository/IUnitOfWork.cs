@@ -20,6 +20,9 @@ namespace BulkyBook.DataAccess.Repository.IRepository
         IAddressRepository Address { get; }
         ICouponRepository Coupon { get; }
         IProductReviewRepository ProductReview { get; }
+        IWalletRepository Wallet { get; }
+        IWalletTransactionRepository WalletTransaction { get; }
+        IOfferRepository Offer { get; }
         void Save();
         public void Update();
     }

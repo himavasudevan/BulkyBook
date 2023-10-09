@@ -55,5 +55,10 @@ namespace BulkyBook.Models
         public CoverType CoverType { get; set; }
 		
         public int Stock { get; set; }
+
+        [NotMapped]
+        public double OfferAmount { get; set; }
+        [NotMapped]
+        public double OfferPercentage { get; set; }
 	}
 }

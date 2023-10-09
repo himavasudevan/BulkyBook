@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using NuGet.Packaging.Signing;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -61,6 +62,20 @@ public class HomeController : Controller
             productList = productList.OrderBy(p => p.Price);
 
         }
+        var offers = _unitOfWork.Offer.GetAll(p=>p.ExpiryDate>=DateTime.Now && p.StartDate<=DateTime.Now);
+        foreach (var product in productList)
+        {
+            var offer = offers.FirstOrDefault(p => p.ProductId == product.Id || p.CategoryId == product.CategoryId);
+            if(offer!= null)
+            {
+                product.OfferAmount = (product.Price) * (offer.Percentage / 100);
+                product.OfferPercentage = offer.Percentage;
+            }
+          
+          
+
+        }
+
 
 
         //IEnumerable<Product> productList = _unitOfWork.Product.GetAll(,includeProperties: "Category,CoverType");
@@ -84,6 +99,23 @@ public class HomeController : Controller
             }
         }
         TempData["AllowReview"] = allowReview;
+
+
+
+        var product = _unitOfWork.Product.GetFirstOrDefault(p => p.Id == productId, includeProperties: "Category,CoverType");
+
+        if (product != null)
+        {
+            var offers = _unitOfWork.Offer.GetAll(p => p.ExpiryDate >= DateTime.Now && p.StartDate <= DateTime.Now);
+            var offer = offers.FirstOrDefault(p => p.ProductId == productId || p.CategoryId == product.CategoryId);
+            if (offer != null)
+            {
+                product.OfferAmount = (product.Price) * (offer.Percentage / 100);
+                product.OfferPercentage = offer.Percentage;
+                
+            }
+            
+        }
 
 
 
@@ -361,47 +393,7 @@ public class HomeController : Controller
         return View(obj);
     }
 
-//public ActionResult SelectAddress(int? id,int? orderId) {
 
-
-//             if (id == 0)
-//              {
-//                var claimsIdentity = (ClaimsIdentity)User.Identity;
-//                  var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-
-//                   var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(P => P.Id.Equals(claim.Value));
-                            
-//                   var orderaddress= _unitOfWork.OrderHeader.GetFirstOrDefault(p => p.Id == orderId );
-//                orderaddress.PhoneNumber= user.PhoneNumber;
-//                orderaddress.City= user.City;
-//                orderaddress.PostalCode= user.PostalCode;
-//                orderaddress.StreetAddress= user.StreetAddress;
-//                orderaddress.State= user.State;
-//                 _unitOfWork.OrderHeader.Update(orderaddress);
-//                 _unitOfWork.Save();
-
-//            return RedirectToAction("Cart", "Summary");
-
-//        }
-//        else
-//        {
-            
-//           var orderaddress=_unitOfWork.OrderHeader.GetFirstOrDefault(p=>p.Id == orderId);
-//          var address=  _unitOfWork.Address.GetFirstOrDefault(p => p.id == id);
-//            orderaddress.PhoneNumber= address.PhoneNumber;
-//            orderaddress.City=address.City ;
-//            orderaddress.PostalCode= address.PostalCode  ;
-//            orderaddress.StreetAddress= address.StreetAddress  ;
-//            orderaddress.State= address.State ;
-            
-//            _unitOfWork.OrderHeader.Update(orderaddress);
-//            _unitOfWork.Save();
-//            return RedirectToAction("Cart", "Summary");
-
-//        }
-        
-
-//    }
 
 
 

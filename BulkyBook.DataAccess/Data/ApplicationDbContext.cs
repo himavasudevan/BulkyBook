@@ -23,4 +23,7 @@ public class ApplicationDbContext :IdentityDbContext
     public DbSet<Address>Addresses { get; set; }
     public DbSet<Coupon>Coupons { get; set; }
     public DbSet<ProductReview> ProductReviews { get; set; }
+    public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<WalletTransaction> WalletTransactions { get; set; }
+    public DbSet<Offer> Offers { get; set; }
 }

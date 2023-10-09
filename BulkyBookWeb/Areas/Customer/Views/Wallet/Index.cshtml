@@ -1,0 +1,26 @@
+﻿@model BulkyBook.Models.ViewModels.WalletVM
+
+@{
+    ViewBag.Title = "Wallet";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="text-center">Your Wallet</h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <p class="h4">Balance: $@Model.Balance</p>
+                    </div>
+                    <div class="text-center mt-4">
+                        <a class="btn btn-primary" href="@Url.Action("ViewTransactions", "Wallet")">View Transactions</a>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

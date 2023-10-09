@@ -34,6 +34,7 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUnitOfWork _unitOfWork;
+      
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -42,7 +43,8 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
             RoleManager<IdentityRole> roleManager,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork
+           )
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
@@ -52,6 +54,7 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+          
         }
 
         /// <summary>
@@ -92,6 +95,11 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            /// 
+
+
+           
+
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
@@ -120,6 +128,9 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
             public IEnumerable<SelectListItem> RoleList { get; set; }
             [ValidateNever]
             public IEnumerable<SelectListItem> CompanyList { get; set; }
+            [EmailAddress]
+            [Display(Name = "ReferenceEmail")]
+            public string ReferenceEmail { get; set; }
         }
 
 
@@ -156,6 +167,7 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
                 user.StreetAddress = Input.StreetAddress;
                 user.City = Input.City;
                 user.State = Input.State;
+                Input.ReferenceEmail=Input.ReferenceEmail;
                 user.PostalCode = Input.PostalCode;
                 user.Name = Input.Name;
                 user.PhoneNumber = Input.PhoneNumber;
@@ -167,6 +179,10 @@ namespace BulkyBookWeb.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+
+                  _unitOfWork.Wallet.AddTowallet(Input.Email);
+                   _unitOfWork.Wallet.AddTowallet(Input.ReferenceEmail);
 
                     if (Input.Role == null) {
                         await _userManager.AddToRoleAsync(user, SD.Role_User_Indi);

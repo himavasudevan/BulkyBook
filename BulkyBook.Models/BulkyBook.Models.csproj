@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Remove="Invoice.cs" />
+    <Compile Remove="ViewModels\AddFundVM.cs" />
     <Compile Remove="ViewModels\ProductImage.cs" />
     <Compile Remove="ViewModels\ProductImages.cs" />
   </ItemGroup>

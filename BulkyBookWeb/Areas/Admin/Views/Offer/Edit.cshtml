@@ -1,0 +1,124 @@
+﻿@model Offer
+
+<form method="post" asp-action="Edit">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Edit Offer</h2>
+            <hr />
+        </div>
+        <div class="mb-3">
+            <label asp-for="StartDate"></label>
+            <input asp-for="StartDate" class="form-control" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="ExpiryDate"></label>
+            <input asp-for="ExpiryDate" class="form-control" />
+            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Percentage"></label>
+            <input asp-for="Percentage" class="form-control" />
+            <span asp-validation-for="Percentage" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="OfferType"></label>
+            <select asp-for="OfferType" class="form-control" id="offerTypeSelect" onchange="loadOfferOptions()">
+                <option value=""></option>
+                <option value="Product">Product</option>
+                <option value="Category">Category</option>
+            </select>
+            <span asp-validation-for="OfferType" class="text-danger"></span>
+        </div>
+        <div class="mb-3" id="productDropdown" style="display: none;">
+            <label asp-for="ProductId"></label>
+            <select asp-for="ProductId" class="form-control" id="SelectedProductId">
+            </select>
+            <span asp-validation-for="ProductId" class="text-danger"></span>
+        </div>
+        <div class="mb-3" id="categoryDropdown" style="display: none;">
+            <label asp-for="CategoryId"></label>
+            <select asp-for="CategoryId" class="form-control" id="SelectedCategoryId">
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:150px">Update</button>
+        <a asp-controller="Offer" asp-action="Index" class="btn btn-secondary" style="width:150px">
+            Back to List
+        </a>
+    </div>
+</form>
+
+
+
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    // Function to load offer options based on the selected offer type
+    function loadOfferOptions(selectedOption) {
+        if (selectedOption === "Product" || selectedOption === "Category") {
+            $.ajax({
+                url: '/Admin/Offer/GetOfferOptions',
+                type: 'GET',
+                data: { offerType: selectedOption },
+                dataType: 'json',
+                success: function (data) {
+                    if (selectedOption === "Product") {
+                        var productDropdown = $("#SelectedProductId");
+                        productDropdown.empty();
+                        $.each(data, function (index, item) {
+                            productDropdown.append($('<option value="' + item.value + '">' + item.text + '</option>', {
+                                value: item.Value,
+                                text: item.Text
+                            }));
+                        });
+                        $("#productDropdown").show();
+                        $("#categoryDropdown").hide();
+                    } else if (selectedOption === "Category") {
+                        var categoryDropdown = $("#SelectedCategoryId");
+                        categoryDropdown.empty();
+                        $.each(data, function (index, item) {
+                            categoryDropdown.append($('<option value="' + item.value + '">' + item.text + '</option>', {
+                                value: item.Value,
+                                text: item.Text
+                            }));
+                        });
+                        $("#categoryDropdown").show();
+                        $("#productDropdown").hide();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            $("#productDropdown").hide();
+            $("#categoryDropdown").hide();
+        }
+    }
+
+    
+    $(document).ready(function () {
+        var selectedOption = $("#offerTypeSelect").val();
+        console.log(selectedOption);
+        loadOfferOptions(selectedOption);
+    });
+
+    
+    $("#offerTypeSelect").on("change", function () {
+        var selectedOption = $(this).val();
+        loadOfferOptions(selectedOption);
+    });
+</script>
+
+
+
+                

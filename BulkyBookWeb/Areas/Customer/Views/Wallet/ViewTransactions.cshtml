@@ -1,0 +1,33 @@
+﻿@model List< BulkyBook.Models.ViewModels.WalletTRansactionVM >
+<h2>Wallet Transaction History</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Transaction Date</th>
+            <th>Transaction Amount</th>
+            <th>Order Summary</th>
+            <th>Transaction Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var transaction in Model)
+            {
+                <tr>
+                    <td>@transaction.TransactionDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@transaction.TransactionAmount.ToString("C")</td>
+                    <td>
+                        @if (transaction.OrderId != null)
+                        {
+                            <a href="/Admin/Order/Details?orderId=@transaction.OrderId">View Order</a>
+                        }
+
+                    </td>
+                    <td>@transaction.Description</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
