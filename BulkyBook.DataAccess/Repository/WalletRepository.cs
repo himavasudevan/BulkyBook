@@ -60,7 +60,9 @@ namespace BulkyBook.DataAccess.Repository
                     WalletId = newwallet.WalletId,
                     TransactionDate = DateTime.Now,
                     TransactionAmount =100 ,
-                    OrderId = null,
+                    OrderId = null
+                    
+                    ,
                     description = "reference refund"
 
 

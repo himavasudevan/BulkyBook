@@ -143,14 +143,14 @@ public class ProductController : Controller
             {
                 _unitOfWork.Product.Add(obj.Product);
                 _unitOfWork.Save();
-                TempData["success"] = "Product created successfully";
+                TempData["success"] = constants.productcreated;
                 return RedirectToAction("Index");
             }
             else
             {
                 _unitOfWork.Product.Update(obj.Product);
                 _unitOfWork.Save();
-                TempData["success"] = "Product updated successfully";
+                TempData["success"] = constants.productupdated;
                 return RedirectToAction("Index");
             }
             
@@ -182,7 +182,7 @@ public class ProductController : Controller
             _unitOfWork.Product.Update(product);
             _unitOfWork.Save();
 
-            TempData["success"] = "Product images deleted successfully";
+            TempData["success"] = constants.productimagesdeleted;
             return RedirectToAction("Upsert", new {id=productId});
 
         }
@@ -204,7 +204,7 @@ public class ProductController : Controller
         var obj = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
         if (obj == null)
         {
-            return Json(new { success = false, message = "Error while deleting" });
+            return Json(new { success = false, message = constants.errorwhiledeleting});
         }
 
         var oldImagePath = Path.Combine(_hostEnvironment.WebRootPath, obj.ImageUrl.TrimStart('\\'));
@@ -215,7 +215,7 @@ public class ProductController : Controller
 
         _unitOfWork.Product.Remove(obj);
         _unitOfWork.Save();
-        return Json(new { success = true, message = "Delete Successful" });
+        return Json(new { success = true, message = constants.imagedeleted });
 
     }
     

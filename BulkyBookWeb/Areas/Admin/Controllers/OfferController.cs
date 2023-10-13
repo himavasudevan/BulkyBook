@@ -46,7 +46,7 @@ public class OfferController : Controller
 
             _unitOfWork.Offer.Add(obj);
             _unitOfWork.Save();
-            TempData["success"] = "Offer created successfully";
+            TempData["success"] = constants.offercreated;
             return RedirectToAction("Index");
 
         }
@@ -113,7 +113,7 @@ public class OfferController : Controller
         {
             _unitOfWork.Offer.Update(obj);
             _unitOfWork.Save();
-            TempData["success"] = "Offer updated successfully";
+            TempData["success"] = constants.offerupdated;
             return RedirectToAction("Index");
         }
         return View(obj);
@@ -150,7 +150,7 @@ public class OfferController : Controller
 
         _unitOfWork.Offer.Remove(obj);
         _unitOfWork.Save();
-        TempData["success"] = "Offer deleted successfully";
+        TempData["success"] =constants.offerdeleted;
         return RedirectToAction("Index");
 
     }

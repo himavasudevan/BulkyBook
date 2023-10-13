@@ -52,7 +52,7 @@ public class HomeController : Controller
             productList = productList.OrderBy(p => p.Title);
 
         }
-        else if (SortOrder == "PrizeFromHighToLow")
+        else if (SortOrder == "PriceHighToLow")
         {
             productList = productList.OrderByDescending(p => p.Price);
 
@@ -188,7 +188,7 @@ public class HomeController : Controller
             _unitOfWork.WishList.Remove(existingWishListItem);
             _unitOfWork.Save();
 
-            TempData["error"] = "Product removed from wish list";
+            TempData["error"] = constants.productremovedfromwishlist;
             if (isWishListPage == false)
             {
                 return RedirectToAction("Details", new { ProductId = id });
@@ -205,7 +205,7 @@ public class HomeController : Controller
 
             _unitOfWork.WishList.Add(new WishList() { ProductId = id, ApplicationUserId = claim.Value });
             _unitOfWork.Save();
-            TempData["success"] = "Product Added to wish list";
+            TempData["success"] = constants.productaddedtowishlist;
 
             return RedirectToAction("Details", new { ProductId = id });
 
@@ -274,7 +274,7 @@ public class HomeController : Controller
             obj.ApplicationUserId = claim.Value;
             _unitOfWork.Address.Add(obj);
             _unitOfWork.Save();
-            TempData["success"] = "Address Added successfully";
+            TempData["success"] =constants.addressadded;
             return RedirectToAction("Address");
         }
 
@@ -315,7 +315,7 @@ public class HomeController : Controller
 
         _unitOfWork.Address.Remove(obj);
         _unitOfWork.Save();
-        TempData["success"] = "Address deleted successfully";
+        TempData["success"] = constants.addressdeleted;
         return RedirectToAction("Address");
 
     }
@@ -386,7 +386,7 @@ public class HomeController : Controller
                 obj.ApplicationUserId = claim.Value;
                 _unitOfWork.Address.Update(obj);
                 _unitOfWork.Save();
-                TempData["success"] = "Address updated successfully";
+                TempData["success"] = constants.addressupdated;
                 return RedirectToAction("Address");
             }
         }

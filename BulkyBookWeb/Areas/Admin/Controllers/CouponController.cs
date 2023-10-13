@@ -45,7 +45,7 @@ public class CouponController : Controller
 
 			_unitOfWork.Coupon.Add(obj);
 			_unitOfWork.Save();
-			TempData["success"] = "Coupon created successfully";
+			TempData["success"] = constants.couponcreated;
 			return RedirectToAction("Index");
 
 		}
@@ -81,7 +81,7 @@ public class CouponController : Controller
 		{
 			_unitOfWork.Coupon.Update(obj);
 			_unitOfWork.Save();
-			TempData["success"] = "Coupon updated successfully";
+			TempData["success"] =constants.couponcreated;
 			return RedirectToAction("Index");
 		}
 		return View(obj);
@@ -109,17 +109,29 @@ public class CouponController : Controller
 	[HttpPost, ActionName("Delete")]
 	[ValidateAntiForgeryToken]
 	public IActionResult DeletePOST(int? id)
-	{
+	{  
 		var obj = _unitOfWork.Coupon.GetFirstOrDefault(u => u.Id == id);
-		if (obj == null)
+
+
+        var orderHeaders = _unitOfWork.OrderHeader.GetAll(u => u.CouponId == id);
+		if (orderHeaders != null && orderHeaders.Any())
+		{
+			TempData["error"] = constants.couponcantdelete;
+			return RedirectToAction("Index");
+		}
+
+		else if (obj == null)
 		{
 			return NotFound();
 		}
 
-		_unitOfWork.Coupon.Remove(obj);
-		_unitOfWork.Save();
-		TempData["success"] = "Coupon deleted successfully";
-		return RedirectToAction("Index");
+		else
+		{
+			_unitOfWork.Coupon.Remove(obj);
+			_unitOfWork.Save();
+			TempData["success"] = constants.coupondeleted;
+			return RedirectToAction("Index");
+		}
 
 	}
 	

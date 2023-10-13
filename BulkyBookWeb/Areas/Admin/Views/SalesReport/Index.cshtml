@@ -1,10 +1,9 @@
-﻿ 
-@model List<SalesReport>
+﻿@model List<SalesReport>
+<script src="html2pdf.bundle.min.js"></script>
+<script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
 
 <h2>Sales Report</h2>
-<br />
-<br />
-<br />
+
 <form method="get">
     <div class="form-group" style="display: inline-block; margin-right: 80px;">
         <label for="fromDate">From Date:</label>
@@ -14,22 +13,19 @@
         <label for="toDate">To Date:</label>
         <input type="date" id="toDate" name="toDate" class="form-control" style="width: 150px;" />
     </div>
-    
-    
     <button type="submit" class="btn btn-primary">Filter</button>
-   
+    <button id="exportButton" class="btn btn-success" >Export to PDF</button>
 </form>
 
-<br />
-<br />
-<br />
+<div id="pdfContainer">
 
-<table class="table">
+<table class="table" id="salesReportTable">
     <thead>
         <tr>
             <th>Product ID</th>
             <th>Product Title</th>
             <th>Total Count</th>
+            <th>Total Amount</th>
         </tr>
     </thead>
     <tbody>
@@ -39,14 +35,26 @@
                 <td>@item.ProductId</td>
                 <td>@item.ProductTitle</td>
                 <td>@item.TotalCount</td>
-                
+                <td>@item.TotalAmount</td>
             </tr>
         }
     </tbody>
 </table>
 
-@section scripts {
-    <script>
-        
-    </script>
-}
+<div>
+    <strong>Total Count:</strong> @ViewBag.TotalCount
+</div>
+<div>
+    <strong>Total Amount:</strong> @ViewBag.TotalAmount
+</div>
+</div>
+<script>
+    document.getElementById('exportButton').addEventListener("click", function (event) {
+        event.preventDefault();
+        var element = document.getElementById('pdfContainer');
+        html2pdf(element);
+    });
+
+   
+
+</script>

@@ -58,12 +58,12 @@ public class CompanyController : Controller
             if (obj.Id == 0)
             {
                 _unitOfWork.Company.Add(obj);
-                TempData["success"] = "Company created successfully";
+                TempData["success"] = constants.compantcreated;
             }
             else
             {
                 _unitOfWork.Company.Update(obj);
-                TempData["success"] = "Company updated successfully";
+                TempData["success"] = constants.companyupdated;
             }
             _unitOfWork.Save();
             
@@ -89,12 +89,12 @@ public class CompanyController : Controller
         var obj = _unitOfWork.Company.GetFirstOrDefault(u => u.Id == id);
         if (obj == null)
         {
-            return Json(new { success = false, message = "Error while deleting" });
+            return Json(new { success = false, message = constants.meassagejson });
         }
 
         _unitOfWork.Company.Remove(obj);
         _unitOfWork.Save();
-        return Json(new { success = true, message = "Delete Successful" });
+        return Json(new { success = true, message = constants.companydeletedsucces });
 
     }
     #endregion

@@ -32,6 +32,8 @@ public class CategoryController : Controller
 		return View();
 	}
 
+
+
 	//POST
 	[HttpPost]
 	[ValidateAntiForgeryToken]
@@ -39,7 +41,7 @@ public class CategoryController : Controller
 	{
 		if (obj.Name == obj.DisplayOrder.ToString())
 		{
-			ModelState.AddModelError("name", "The DisplayOrder cannot exactly match the Name.");
+			ModelState.AddModelError("name", constants.categorynamemustbeunique);
 		}
 		if (ModelState.IsValid)
 		{
@@ -47,14 +49,14 @@ public class CategoryController : Controller
 			if (IsDuplicate == true)
 			{
 
-				ModelState.AddModelError("Name", "Category already existing");
+				ModelState.AddModelError("Name", constants.catgryexisting);
 			}
 			else
 			{
 
 				_unitOfWork.Category.Add(obj);
 				_unitOfWork.Save();
-				TempData["success"] = "Category created successfully";
+				TempData["success"] = constants.catgrycreated;
 				return RedirectToAction("Index");
 			}
 		}
@@ -87,13 +89,13 @@ public class CategoryController : Controller
 	{
 		if (obj.Name == obj.DisplayOrder.ToString())
 		{
-			ModelState.AddModelError("name", "The DisplayOrder cannot exactly match the Name.");
+			ModelState.AddModelError("name", constants.uniquedisplayorder);
 		}
 		if (ModelState.IsValid)
 		{
 			_unitOfWork.Category.Update(obj);
 			_unitOfWork.Save();
-			TempData["success"] = "Category updated successfully";
+			TempData["success"] = constants.categryupdated;
 			return RedirectToAction("Index");
 		}
 		return View(obj);
@@ -130,7 +132,7 @@ public class CategoryController : Controller
 
 		_unitOfWork.Category.Remove(obj);
 		_unitOfWork.Save();
-		TempData["success"] = "Category deleted successfully";
+		TempData["success"] = constants.catgrydeleted;
 		return RedirectToAction("Index");
 
 	}

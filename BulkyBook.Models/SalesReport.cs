@@ -12,6 +12,7 @@ namespace BulkyBook.Models
         public int ProductId { get; set; }
         public string ProductTitle { get; set; }
         public int TotalCount { get; set; }
+        public double TotalAmount { get;set; }
 
 
 

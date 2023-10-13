@@ -40,7 +40,7 @@ public class CoverTypeController : Controller
         {
             _unitOfWork.CoverType.Add(obj);
             _unitOfWork.Save();
-            TempData["success"] = "CoverType created successfully";
+            TempData["success"] = constants.covertypecreated;
             return RedirectToAction("Index");
         }
         return View(obj);   
@@ -73,7 +73,7 @@ public class CoverTypeController : Controller
         {
             _unitOfWork.CoverType.Update(obj);
             _unitOfWork.Save();
-            TempData["success"] = "CoverType updated successfully";
+            TempData["success"] = constants.covertypeupdated;
             return RedirectToAction("Index");
         }
         return View(obj);
@@ -108,7 +108,7 @@ public class CoverTypeController : Controller
 
         _unitOfWork.CoverType.Remove(obj);
             _unitOfWork.Save();
-        TempData["success"] = "CoverType deleted successfully";
+        TempData["success"] = constants.covertypedeleted;
         return RedirectToAction("Index");
         
     }

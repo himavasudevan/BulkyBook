@@ -1,0 +1,126 @@
+﻿@model CombinedDashboardVM 
+@using System.Linq;
+@using BulkyBook.Models.ViewModels;
+
+<!-- Include Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div>
+    <h2>Monthly Chart</h2>
+    <br />
+    <br />
+    <br />
+
+
+    <form method="get">
+        <div class="form-group" style="display: inline-block; margin-right: 80px;">
+            <label for="fromDate">From Date:</label>
+            <input type="date" id="fromDate" name="fromDate" class="form-control" style="width: 200px;" />
+        </div>
+        <div class="form-group" style="display: inline-block; margin-right: 80px;">
+            <label for="toDate">To Date:</label>
+            <input type="date" id="toDate" name="toDate" class="form-control" style="width: 150px;" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <!-- Adjust the canvas size -->
+    <canvas id="monthlyChart" width="800" height="150"></canvas>
+
+
+    
+
+
+    <script>
+        var chartData = {
+            labels: @Html.Raw(Json.Serialize(Model.MonthlySalesData.Select(p=>p.MonthName))), 
+            datasets: [{
+                label: 'Total Count',
+                data: @Html.Raw(Json.Serialize(Model.MonthlySalesData.Select(p=>p.TotalSaleCount))),
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                barThickness: 10,
+            }, {
+                label: 'Total Amount',
+                data: @Html.Raw(Json.Serialize(Model.SalesReportData.Select(p=>p.TotalAmount))),
+                backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+                barThickness: 10,
+            }]
+        };
+
+        var ctx = document.getElementById('monthlyChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Value'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+
+<div>
+    
+    <h2>Sales Report</h2>
+    
+    
+    <br />
+    <br />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Title</th>
+                <th>Total Count</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.SalesReportData)
+            {
+                <tr>
+                    <td>@item.ProductId</td>
+                    <td>@item.ProductTitle</td>
+                    <td>@item.TotalCount</td>
+                    <td>@item.TotalAmount</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        
+
+
+
+        @section scripts {
+            <script>
+
+            </script>
+        }
+        </div>
+
+

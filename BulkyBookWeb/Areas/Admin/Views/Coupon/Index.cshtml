@@ -29,6 +29,8 @@
                 <th>   Coupon Code</th>
                 <th>   Offer Type</th>
                 <th>   Offer Value</th>
+                <th>Minimum CartAmount</th>
+                <th>Max RedeemableAmount</th>
 
             </tr>
         </thead>
@@ -51,7 +53,12 @@
                     <td width="40%">
                         @obj.OfferValue
                     </td>
-
+                    <td width="70%">
+                        @obj.minimumCartAmount
+                    </td>
+                    <td width="90%">
+                        @obj.maxRedeemableAmt
+                    </td>
 
                     <td>
                         <div class="w-75 btn-group" role="group">

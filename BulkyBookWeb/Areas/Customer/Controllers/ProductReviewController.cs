@@ -62,7 +62,7 @@ public class ProductReviewController : Controller
             if (existingReview != null)
             {
                 // Return a custom JSON response for the error case
-                return Json(new { success = false, message = "You have already submitted a review for this product." });
+                return Json(new { success = false, message = constants.reviewalreadyhave });
             }
 
             // If not, proceed to save the review
@@ -71,11 +71,11 @@ public class ProductReviewController : Controller
             _unitOfWork.Save();
 
             // Return a custom JSON response for the success case
-            return Json(new { success = true, message = "Review submitted successfully.", savedObject = obj });
+            return Json(new { success = true, message = constants.reviewsubmitted, savedObject = obj });
         }
 
         // Return a custom JSON response for validation failure
-        return Json(new { success = false, message = "Validation failed." });
+        return Json(new { success = false, message = constants.validationfailed });
     }
 
 }

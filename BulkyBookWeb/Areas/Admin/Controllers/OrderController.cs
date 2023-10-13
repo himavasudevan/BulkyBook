@@ -2,6 +2,7 @@
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
+using BulkyBookWeb.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
@@ -132,7 +133,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             }
             _unitOfWork.OrderHeader.Update(orderHEaderFromDb);
             _unitOfWork.Save();
-            TempData["Success"] = "Order Details Updated Successfully.";
+            TempData["Success"] =constants.orderupdated;
             return RedirectToAction("Details", "Order", new { orderId = orderHEaderFromDb.Id });
         }
 
@@ -143,7 +144,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         {
             _unitOfWork.OrderHeader.UpdateStatus(OrderVM.OrderHeader.Id, SD.StatusInProcess);
             _unitOfWork.Save();
-            TempData["Success"] = "Order Status Updated Successfully.";
+            TempData["Success"] =constants.orderstatusupdated;
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
         }
 
@@ -163,7 +164,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             }
             _unitOfWork.OrderHeader.Update(orderHeader);
              _unitOfWork.Save();
-            TempData["Success"] = "Order Shipped Successfully.";
+            TempData["Success"] = constants.ordershipped;
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
         }
 
@@ -272,7 +273,7 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             _unitOfWork.Save();
 
 
-            TempData["Success"] = "Order Cancelled Successfully.";
+            TempData["Success"] = constants.ordercancelled;
             return RedirectToAction("Details", "Order", new { orderId = OrderVM.OrderHeader.Id });
 
 

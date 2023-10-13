@@ -2,6 +2,7 @@
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
+using BulkyBookWeb.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -243,7 +244,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
             }
             ApplicationUser applicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Id == claim.Value);
-            if (applicationUser.CompanyId.GetValueOrDefault() == 0 && ShoppingCartVM.OrderHeader.CashOnDelivery == false)
+            if (applicationUser.CompanyId.GetValueOrDefault() == 0 && ShoppingCartVM.OrderHeader.CashOnDelivery == true)
             {
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
@@ -318,10 +319,10 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 return new StatusCodeResult(303);
             }
 
-            else
-            {
-                return RedirectToAction("OrderConfirmation", "Cart", new { id = ShoppingCartVM.OrderHeader.Id });
-            }
+            
+            else {
+				return RedirectToAction("OrderConfirmation", "Cart", new { id = ShoppingCartVM.OrderHeader.Id });
+			}
 
         }
         [HttpGet]
@@ -415,10 +416,12 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
             var shoppingcart = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == claim.Value);
-            if (ShoppingCartVM.TotalOfferAmount > 0)
+
+
+            if ( ShoppingCartVM!=null && ShoppingCartVM.TotalOfferAmount > 0 )
             {
 
-                return BadRequest("coupon cant be applied with the offer");
+               return BadRequest(constants.couponcantbeappledwithoffer);
 
             }
             var coupon = _unitOfWork.Coupon.GetFirstOrDefault(p => p.CouponCode == CouponCode);
@@ -429,13 +432,16 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             }
             if (coupon.ExpiryDate < DateTime.Now)
             {
-                return BadRequest("Coupon expired");
+                return BadRequest(constants.couponexpired);
             }
             if (coupon.StartDate > DateTime.Now)
             {
-                return BadRequest("Coupon is not yet valid");
+                return BadRequest(constants.couponisnotyetvalid);
 
             }
+            
+           
+
 
 
             ShoppingCartVM = new ShoppingCartVM()
@@ -453,16 +459,25 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                     cart.Product.Price50, cart.Product.Price100);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }
+			if (ShoppingCartVM.OrderHeader.OrderTotal < coupon.minimumCartAmount)
+			{
 
+				return BadRequest(constants.couponisnotapplicable);
+			}
 
-            var OrderTotal = ShoppingCartVM.OrderHeader.OrderTotal;
+			var OrderTotal = ShoppingCartVM.OrderHeader.OrderTotal;
             if (coupon != null)
             {
                 if (coupon.OfferType == "Percentage")
-                {
+                {     
                     couponAmount = ((double)coupon.OfferValue / 100) * OrderTotal;
+                    if(couponAmount>coupon.maxRedeemableAmt)
+                    {
+
+                        couponAmount = coupon.maxRedeemableAmt?? couponAmount;
+                    }
                 }
-                else if (coupon.OfferType == "FixedAmount")
+                else if (coupon.OfferType == "FixedAmount"   && coupon.minimumCartAmount<=OrderTotal)
                 {
 
                     couponAmount = coupon.OfferValue;
@@ -602,7 +617,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             if (wallet == null)
             {
 
-                TempData["Error"] = "Wallet not found for the user.";
+                TempData["Error"] = constants.walletnotfound;
                 return RedirectToAction("Summary");
             }
 
@@ -631,12 +646,12 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 _unitOfWork.OrderHeader.UpdateStatus(ShoppingCartVM.OrderHeader.Id, SD.PaymentStatusApproved, SD.StatusApproved);
                 _unitOfWork.Save();
 
-                TempData["Success"] = "Order Paid with Wallet Successfully.";
+                TempData["Success"] = constants.orderpaidwithwallet;
                 return RedirectToAction("OrderConfirmation", "Cart", new { id = ShoppingCartVM.OrderHeader.Id });
             }
             else
             {
-                TempData["Error"] = "Insufficient funds in the wallet to complete the payment.";
+                TempData["Error"] = constants.insufficientfund;
                 return RedirectToAction("Summary");
             }
         }

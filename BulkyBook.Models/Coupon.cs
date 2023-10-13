@@ -25,6 +25,8 @@ namespace BulkyBook.Models
 		[Required]
 		public string OfferType { get; set; }
         public int OfferValue {get; set; }
+        public double? minimumCartAmount { get; set; }   
+        public double? maxRedeemableAmt { get; set; }
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             List<ValidationResult> errors = new List<ValidationResult>();

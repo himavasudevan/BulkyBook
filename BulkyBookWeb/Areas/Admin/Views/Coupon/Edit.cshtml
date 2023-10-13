@@ -36,6 +36,16 @@
 			<input asp-for="OfferValue" class="form-control" />
 			<span asp-validation-for="OfferValue" class="text-danger"></span>
 		</div>
+		<div class="mb-3">
+			<label asp-for="minimumCartAmount"></label>
+			<input asp-for="minimumCartAmount" class="form-control" />
+			<span asp-validation-for="minimumCartAmount" class="text-danger"></span>
+		</div>
+		<div class="mb-3">
+			<label asp-for="maxRedeemableAmt"></label>
+			<input asp-for="maxRedeemableAmt" class="form-control" />
+			<span asp-validation-for="maxRedeemableAmt" class="text-danger"></span>
+		</div>
 		<button type="submit" class="btn btn-primary" style="width:150px">Update</button>
 		<a asp-controller="Coupon" asp-action="Index" class="btn btn-secondary" style="width:150px">
 			Back to List
