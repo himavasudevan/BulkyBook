@@ -51,9 +51,9 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
             OrderVM.OrderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id, includeProperties: "ApplicationUser");
             OrderVM.OrderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderId == OrderVM.OrderHeader.Id, includeProperties: "Product");
 
-            //stripe settings 
-            var domain = "https://localhost:44300/";
-            var options = new SessionCreateOptions
+			//stripe settings 
+			var domain = "https://" + Request.Host.Value + "/";
+			var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string>
                 {
