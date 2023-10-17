@@ -244,15 +244,15 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
 
             }
             ApplicationUser applicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Id == claim.Value);
-            if (applicationUser.CompanyId.GetValueOrDefault() == 0 && ShoppingCartVM.OrderHeader.CashOnDelivery == true)
-            {
-                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
-                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
-            }
-            else
+            if (applicationUser.CompanyId.GetValueOrDefault() != 0 || ShoppingCartVM.OrderHeader.CashOnDelivery == true)
             {
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
                 ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+            }
+            else
+            {
+                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
             }
 
             _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
@@ -327,7 +327,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
         }
         [HttpGet]
         public IActionResult OrderConfirmation(int id)
-        {
+      {
             OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == id, includeProperties: "ApplicationUser");
 
             var orderDetail = _unitOfWork.OrderDetail.GetAll(u => u.OrderId == id, includeProperties: "Product");
@@ -340,7 +340,7 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
                 item.Product.Stock = item.Product.Stock - count;
             }
             _unitOfWork.Save();
-            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment && orderHeader.PaymentMode == "Card")
+            if (!string.IsNullOrEmpty(orderHeader.SessionId)  && orderHeader.PaymentMode == "Card")
 
             {
 
@@ -571,21 +571,31 @@ namespace BulkyBookWeb.Areas.Customer.Controllers
             ApplicationUser applicationUser = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Id == claim.Value);
 
 
+			
+			if (applicationUser.CompanyId.GetValueOrDefault() != 0 || ShoppingCartVM.OrderHeader.CashOnDelivery == true)
+			{
+				ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+				ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
+			}
+			else
+			{
+				ShoppingCartVM.OrderHeader.PaymentStatus = SD.StatusApproved;
+				ShoppingCartVM.OrderHeader.OrderStatus = SD.PaymentStatusApproved;
+			}
 
 
+			//if (applicationUser.CompanyId.GetValueOrDefault() == 0 && ShoppingCartVM.OrderHeader.CashOnDelivery == false)
+			//{
+			//    ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+			//    ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+			//}
+			//else
+			//{
+			//    ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+			//    ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
+			//}
 
-            if (applicationUser.CompanyId.GetValueOrDefault() == 0 && ShoppingCartVM.OrderHeader.CashOnDelivery == false)
-            {
-                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
-                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusPending;
-            }
-            else
-            {
-                ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
-                ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
-            }
-
-            _unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
+			_unitOfWork.OrderHeader.Add(ShoppingCartVM.OrderHeader);
             _unitOfWork.Save();
             foreach (var cart in ShoppingCartVM.ListCart)
             {

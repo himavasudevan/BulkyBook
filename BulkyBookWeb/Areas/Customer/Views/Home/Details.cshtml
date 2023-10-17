@@ -87,16 +87,16 @@
 
                                     <!-- Slides -->
                                     <div class="swiper-slide">
-                                        <a href="@Model.Product.ImageUrl" data-fancybox="images" data-fancybox-thumb="@Model.Product.ImageUrl">
-                                            <img src="@Model.Product.ImageUrl" width="100%" style="height:300px" class="rounded">
+                                            <a href="https://bulkyimages.blob.core.windows.net/productimages/@Model.Product.ImageUrl" data-fancybox="images" data-fancybox-thumb="@Model.Product.ImageUrl">
+                                                <img src="https://bulkyimages.blob.core.windows.net/productimages/@Model.Product.ImageUrl" width="100%" style="height:300px" class="rounded">
                                         </a>
                                     </div>
 
                                     @foreach (var image in Model.Product.ProductImages)
                                     {
                                         <div class="swiper-slide">
-                                            <a href="@image.ImageUrl" data-fancybox="images" data-fancybox-thumb="@image.ImageUrl">
-                                                <img src="@image.ImageUrl" width="100%" style="height:300px" class="rounded">
+                                                <a href="https://bulkyimages.blob.core.windows.net/productimages/@image.ImageUrl" data-fancybox="images" data-fancybox-thumb="@image.ImageUrl">
+                                                    <img src="https://bulkyimages.blob.core.windows.net/productimages/@image.ImageUrl" width="100%" style="height:300px" class="rounded">
                                             </a>
                                         </div>
                                     }

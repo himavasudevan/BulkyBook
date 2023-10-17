@@ -1,4 +1,5 @@
-﻿using BulkyBook.DataAccess;
+﻿using Azure.Storage.Blobs;
+using BulkyBook.DataAccess;
 using BulkyBook.DataAccess.Migrations;
 using BulkyBook.DataAccess.Repository;
 using BulkyBook.DataAccess.Repository.IRepository;
@@ -17,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BulkyBookWeb.Controllers;
 [Area("Admin")]
@@ -78,7 +80,7 @@ public class ProductController : Controller
     //POST
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Upsert(ProductVM obj, IFormFile? file)
+    public async Task<IActionResult> Upsert(ProductVM obj, IFormFile? file)
     {
 
         if (ModelState.IsValid)
@@ -90,20 +92,22 @@ public class ProductController : Controller
                 var uploads = Path.Combine(wwwRootPath, @"images\products");
                 var extension = Path.GetExtension(file.FileName);
 
-                if (obj.Product.ImageUrl != null)
-                {
-                    var oldImagePath = Path.Combine(wwwRootPath, obj.Product.ImageUrl.TrimStart('\\'));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
+                //if (obj.Product.ImageUrl != null)
+                //{
+                //    var oldImagePath = Path.Combine(wwwRootPath, obj.Product.ImageUrl.TrimStart('\\'));
+                //    if (System.IO.File.Exists(oldImagePath))
+                //    {
+                //        System.IO.File.Delete(oldImagePath);
+                //    }
+                //}
+                await BlobUploadFileAsync(file, fileName+ extension);
 
-                using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
-                {
-                    file.CopyTo(fileStreams);
-                }
-                obj.Product.ImageUrl = @"\images\products\" + fileName + extension;
+
+				//using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
+    //            {
+    //                file.CopyTo(fileStreams);
+    //            }
+                obj.Product.ImageUrl =   fileName + extension;
 
             }
 
@@ -119,21 +123,22 @@ public class ProductController : Controller
                         string fileName = Guid.NewGuid().ToString();
                         var uploads = Path.Combine(wwwRootPath, @"images\products");
                         var extension = Path.GetExtension(image.FileName);
+                        //using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
+                        //{
+                        //    image.CopyTo(fileStreams);
+                        //}
 
-                        
-
-                        using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
-                        {
-                            image.CopyTo(fileStreams);
-                        }
-                    
-                        obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
+                        //obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
 
                         //if (obj.Product.ProductImages != null)
                         //{
                         //    obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
 
                         //}
+                        //obj.Product.ProductImages.Add(new ProductImage() { ImageUrl = @"\images\products\" + fileName + extension });
+                        await BlobUploadFileAsync(image, fileName + extension);
+                        obj.Product.ProductImages.Add(new ProductImage() { ImageUrl =   fileName + extension });
+
                     }
 
                 }
@@ -158,11 +163,28 @@ public class ProductController : Controller
         return View(obj);
     }
 
+	public async Task BlobUploadFileAsync(IFormFile file,string filename)
+	{
+		var blobConnectionString = "DefaultEndpointsProtocol=https;AccountName=bulkyimages;AccountKey=6KF/4Pl3UeKz3qfPAco2lvXVpdLVRahzN39dodjV/RVnim+eQTZBgVMZH2RLhH6dCNt02azTfng6+AStVZIHag==;EndpointSuffix=core.windows.net";
+		var blobContainerName = "productimages";
+
+		BlobServiceClient blobService = new BlobServiceClient(blobConnectionString);
 
 
+		//get the blob container
+		var blobStorageContainerName = blobService.GetBlobContainerClient(blobContainerName);
+		//get the blob client
+		var blobStorageClient = blobStorageContainerName.GetBlobClient(filename);
+		//read file stream
+		var streamContent = file.OpenReadStream();
+		//upload file
+		await blobStorageClient.UploadAsync(streamContent);
+	}
+	
 
-    #region API CALLS
-    [HttpGet]
+
+	#region API CALLS
+	[HttpGet]
     public IActionResult GetAll()
     {
         var productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
@@ -187,14 +209,6 @@ public class ProductController : Controller
 
         }
         return NotFound();
-            
-
-        
-
-        
-       
-
-       
     }
 
     //POST
